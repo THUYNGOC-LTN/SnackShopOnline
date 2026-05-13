@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %} 
+{% block content %}
+
+<section class="profile_section">
+  <div class="container">
+    <!-- PAGE TITLE -->
+    <h1 class="page_title">👤 Hồ Sơ Của Tôi</h1>
+
+    <!-- PROFILE CARD -->
+    <div class="profile_card">
+      <!-- PROFILE HEADER -->
+      <div class="profile_header">
+        <div class="profile_avatar">
+          {% if user_profile.avatar %}
+          <img src="{{ user_profile.avatar.url }}" alt="Avatar" />
+          {% else %} 👤 {% endif %}
+        </div>
+        <div class="profile_info">
+          <h2>{{ user.last_name }}</h2>
+          <p><b>Email:</b> {{ user.email|default:"Chưa cập nhật" }}</p>
+          <p>
+            <b>Tên đầy đủ:</b>
+            {% if user.first_name and user.last_name %} {{ user.first_name }}  {% endif %}
+          </p>
+          <p><b>Ngày tham gia:</b> {{ user.date_joined|date:"d/m/Y" }}</p>
+        </div>
+      </div>
+
+      <!-- PROFILE DETAILS -->
+      <div class="profile_details">
+        <div class="detail_item">
+          <label>Tên</label>
+          <span>{{ user.first_name|default:"Chưa cập nhật" }}</span>
+        </div>
+        <div class="detail_item">
+          <label>Họ</label>
+          <span>{{ user.last_name|default:"Chưa cập nhật" }}</span>
+        </div>
+        <div class="detail_item">
+          <label>Email</label>
+          <span>{{ user.email|default:"Chưa cập nhật" }}</span>
+        </div>
+        <div class="detail_item">
+          <label>Tên đăng nhập</label>
+          <span>{{ user.last_name }}</span>
+        </div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="profile_buttons">
+        <a href="{% url 'edit_profile' %}" class="btn_edit">
+          ✏️ Chỉnh sửa hồ sơ
+        </a>
+      </div>
+    </div>
+
+    <!-- ORDERS SECTION -->
+    <h2 class="orders_title">📦 Đơn Hàng Của Tôi</h2>
+
+    {% if orders %} {% for order in orders %}
+    <div class="order_card">
+      <!-- ORDER HEADER -->
+      <div class="order_header">
+        <span class="order_code">Mã đơn: {{ order.order_code }}</span>
+        <span
+          class="badge_status {% if order.status == 'PENDING' %}pending{% elif order.status == 'CONFIRMED' %}confirmed{% elif order.status == 'SHIPPING' %}shipping{% elif order.status == 'DELIVERED' %}delivered{% elif order.status == 'CANCELLED' %}cancelled{% endif %}"
+        >
+          {{ order.get_status_display }}
+        </span>
+      </div>
+
+      <!-- ORDER INFO -->
+      <div class="order_info">
+        <div class="order_info_item">
+          <label>Ngày đặt</label>
+          <span>{{ order.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="order_info_item">
+          <label>Người nhận</label>
+          <span>{{ order.fullname }}</span>
+        </div>
+        <div class="order_info_item">
+          <label>Số điện thoại</label>
+          <span>{{ order.phone }}</span>
+        </div>
+        <div class="order_info_item">
+          <label>Phương thức thanh toán</label>
+          <span>{{ order.get_payment_method_display }}</span>
+        </div>
+      </div>
+
+      <!-- ORDER TOTAL AND ACTION -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div class="order_total">
+          Tổng tiền:
+          <span>{{ order.total_price|vnd }}</span>
+        </div>
+        <a href="{% url 'order_detail' order.id %}" class="view_order_btn">
+          👁️ Xem chi tiết
+        </a>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="no_orders">
+      <p>
+        🛒 Bạn chưa có đơn hàng nào.
+        <a
+          href="{% url 'home' %}"
+          style="color: #ffeb33; text-decoration: none; font-weight: 700"
+          >Hãy bắt đầu mua sắm ngay!</a
+        >
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

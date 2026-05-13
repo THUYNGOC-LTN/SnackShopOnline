@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<section class="success_section">
+
+<div class="container">
+
+    <div class="success_card">
+
+        <!-- ICON -->
+        <div class="success_icon">
+            🎉
+        </div>
+
+        <!-- TITLE -->
+        <h1 class="success_title">
+            Đặt hàng thành công
+        </h1>
+
+        <p class="success_subtitle">
+            Cảm ơn bạn đã mua hàng tại SnackShop
+        </p>
+
+        <!-- INFO -->
+        <div class="info_box">
+
+            <div class="info_row">
+                <B>Mã đơn:</B>
+                <span class="code">
+                    {{ order.order_code }}
+                </span>
+            </div>
+
+            <div class="info_row">
+                <B>Người nhận:</B>
+                <b>{{ order.fullname }}</b>
+            </div>
+
+            <div class="info_row">
+                <B>SĐT:</B>
+                <b>{{ order.phone }}</b>
+            </div>
+
+            <div class="info_row">
+                <B>Địa chỉ:</B>
+                <b>{{ order.address }}</b>
+            </div>
+
+            <div class="info_row">
+                <B>Tổng tiền:</B>
+                <b class="text-danger">
+                    {{ order.total_price|vnd }} VND
+                </b>
+            </div>
+
+            <div class="info_row">
+                <B>Thanh toán:</B>
+                <b>{{ order.payment_method }}</b>
+            </div>
+
+            <div class="info_row">
+                <B>Trạng thái:</B>
+
+                {% if order.status == 'PENDING' %}
+                    <span class="badge_status">Chờ xử lý</span>
+                {% else %}
+                    <span class="badge_status">Đã xác nhận</span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- BUTTON -->
+        <a href="{% url 'home' %}" class="home_btn">
+            Tiếp tục mua hàng
+        </a>
+
+    </div>
+
+</div>
+
+</section>
+
+{% endblock %}

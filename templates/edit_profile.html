@@ -1,0 +1,80 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block content %}
+
+<section class="edit_profile_section">
+  <div class="container">
+    <!-- PAGE TITLE -->
+    <h1 class="page_title">✏️ Chỉnh Sửa Hồ Sơ</h1>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- FORM CARD -->
+    <div class="edit_form_card">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- AVATAR SECTION -->
+        <div class="avatar_section">
+          <div class="avatar_preview">
+            {% if avatar_form.avatar.value %}
+            <img src="{{ avatar_form.avatar.value.url }}" alt="Avatar" />
+            {% else %} 👤 {% endif %}
+          </div>
+          <p style="font-size: 12px; color: #999; margin: 0">
+            Ảnh đại diện hiện tại
+          </p>
+        </div>
+
+        <!-- AVATAR UPLOAD -->
+        <div class="form_group">
+          <label for="{{ avatar_form.avatar.id_for_label }}">
+            📸 Thay đổi ảnh đại diện
+          </label>
+          {{ avatar_form.avatar }} {% if avatar_form.avatar.errors %}
+          <small style="color: #dc3545">{{ avatar_form.avatar.errors }}</small>
+          {% endif %}
+        </div>
+
+        <!-- FIRST NAME -->
+        <div class="form_group">
+          <label for="{{ form.first_name.id_for_label }}"> 👤 Tên Đầy Đủ </label>
+          {{ form.first_name }} {% if form.first_name.errors %}
+          <small style="color: #dc3545">{{ form.first_name.errors }}</small>
+          {% endif %}
+        </div>
+
+        <!-- LAST NAME -->
+        <div class="form_group">
+          <label for="{{ form.last_name.id_for_label }}"> 👨‍👩‍👧 User Name </label>
+          {{ form.last_name }} {% if form.last_name.errors %}
+          <small style="color: #dc3545">{{ form.last_name.errors }}</small>
+          {% endif %}
+        </div>
+
+        <!-- EMAIL -->
+        <div class="form_group">
+          <label for="{{ form.email.id_for_label }}"> 📧 Email </label>
+          {{ form.email }} {% if form.email.errors %}
+          <small style="color: #dc3545">{{ form.email.errors }}</small>
+          {% endif %}
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="form_buttons">
+          <button type="submit" class="btn_submit">💾 Lưu thay đổi</button>
+          <a href="{% url 'profile' %}" class="btn_cancel"> ❌ Hủy </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

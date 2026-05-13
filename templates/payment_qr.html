@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<section class="payment_section">
+
+<div class="container d-flex justify-content-center">
+
+<div class="payment_card text-center">
+
+    <!-- ICON -->
+    <div class="payment_icon">💳</div>
+
+    <!-- TITLE -->
+    <h2 class="payment_title">
+        Thanh toán QR
+    </h2>
+
+    <p class="payment_subtitle">
+        Quét mã để hoàn tất đơn hàng của bạn
+    </p>
+
+    <!-- QR -->
+    <div class="qr_box">
+
+        <img src="https://img.vietqr.io/image/MB-123456789-compact.png?amount={{ order.total_price }}&addInfo=DonHang{{ order.id }}&accountName=NGOC">
+
+    </div>
+
+    <!-- INFO -->
+    <div class="info_box">
+
+        <div class="info_label">💰 Số tiền</div>
+        <div class="money">
+            {{ order.total_price|vnd }} VND
+        </div>
+
+        <hr>
+
+        <div class="info_label">🧾 Nội dung chuyển khoản</div>
+
+        <div id="transferContent" class="code_box">
+            DonHang{{ order.id }}
+        </div>
+
+        <button class="copy_btn" onclick="copyText()">
+            📋 Copy nội dung
+        </button>
+
+    </div>
+
+    <!-- WARNING -->
+    <div class="warning">
+        ⚠️ Nhập đúng nội dung để hệ thống xác nhận tự động
+    </div>
+
+    <!-- BUTTON -->
+    <a href="{% url 'confirm_payment' order.id %}" class="btn_primary">
+        ✅ Tôi đã chuyển khoản
+    </a>
+
+    <a href="{% url 'orders' %}" class="btn_secondary">
+        ⬅ Quay lại
+    </a>
+
+</div>
+
+</div>
+
+</section>
+
+<script>
+function copyText(){
+    const text = document.getElementById("transferContent").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Đã copy nội dung!");
+}
+</script>
+
+{% endblock %}

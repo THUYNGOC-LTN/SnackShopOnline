@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<section class="detail_section">
+  <div class="container">
+
+    <!-- TITLE -->
+    <h2 class="detail_title">
+      📦 Chi tiết đơn hàng #{{ order.id }}
+    </h2>
+
+    <!-- STATUS + PAYMENT -->
+    <div class="detail_box">
+
+      <div class="status_section">
+
+        <div class="status_item">
+          <span>📦</span>
+          <div>
+            <b>Trạng thái:</b><br>
+
+            {% if order.status == 'PENDING' %}
+              <span class="badge bg-warning">⏳ Chờ xử lý</span>
+            {% elif order.status == 'CONFIRMED' %}
+              <span class="badge bg-primary">✓ Đã xác nhận</span>
+            {% elif order.status == 'SHIPPING' %}
+              <span class="badge bg-info">🚚 Đang giao</span>
+            {% elif order.status == 'DELIVERED' %}
+              <span class="badge bg-success">✓ Đã giao</span>
+            {% else %}
+              <span class="badge bg-danger">✕ Đã hủy</span>
+            {% endif %}
+
+          </div>
+        </div>
+
+        <div class="status_item">
+          <span>💳</span>
+          <div>
+            <b>Thanh toán:</b><br>
+
+            {% if order.payment_method == 'COD' %}
+              <span class="badge bg-success">💵 Tiền mặt</span>
+            {% else %}
+              <span class="badge bg-dark">💳 Chuyển khoản</span>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ITEMS -->
+    <div class="detail_box">
+
+      <h5>🛍 Sản phẩm đã đặt</h5>
+
+      {% for item in items %}
+      <div class="item_row">
+
+        <!-- LEFT -->
+        <div class="item_left">
+
+          {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item_img">
+          {% else %}
+            <div class="item_img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+              <span style="color: #999;">No Image</span>
+            </div>
+          {% endif %}
+
+          <div class="item_info">
+            <h6>{{ item.product.name }}</h6>
+            <small class="item_qty">Số lượng: <b>{{ item.quantity }}</b></small>
+          </div>
+
+        </div>
+
+        <!-- MIDDLE -->
+        <div class="item_middle">
+          <div class="item_price">
+            {{ item.product.price|vnd }}
+          </div>
+          <small style="color: #999;">mỗi cái</small>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="item_right">
+
+          <div class="item_total">
+            {{ item.get_total|vnd }} VND
+          </div>
+
+          {% if order.status == 'DELIVERED' %}
+            <a href="{% url 'product_detail' item.product.id %}#review"
+               class="review_link">
+              ⭐ Đánh giá ngay
+            </a>
+          {% else %}
+            <span class="not_available">
+              Chưa thể đánh giá
+            </span>
+          {% endif %}
+
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total_section">
+      <h4>
+        💰 Tổng tiền: {{ order.total_price|vnd }} VND
+      </h4>
+    </div>
+
+    <!-- BACK -->
+    <div class="text-center mt-5">
+      <a href="{% url 'orders' %}" class="back_btn">
+        ← Quay lại danh sách đơn hàng
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

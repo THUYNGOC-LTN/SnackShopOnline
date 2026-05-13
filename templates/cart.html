@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<section class="cart_section">
+
+<div class="container">
+
+<h2 class="cart_title">
+🛒 Giỏ hàng của bạn
+</h2>
+
+{% if items %}
+
+    {% for item in items %}
+
+    <div class="cart_card">
+
+        <!-- IMAGE -->
+        <div class="cart_img">
+            {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+                <div style="width:100%; height:100%; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                    <span style="color:#999;">No Image</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- INFO -->
+        <div class="cart_info">
+            <h5>
+                {{ item.product.name }}
+            </h5>
+            <div class="price">
+                {{ item.product.price|vnd }} VND
+            </div>
+        </div>
+
+        <!-- QUANTITY -->
+        <form method="POST"
+              action="/update/{{ item.id }}/"
+              class="cart_qty">
+
+            {% csrf_token %}
+
+            <button type="button"
+            onclick="
+            let input=this.nextElementSibling;
+            if(parseInt(input.value)>1){
+                input.value=parseInt(input.value)-1;
+                this.form.submit();
+            }">
+                −
+            </button>
+
+            <input type="number"
+                   name="quantity"
+                   value="{{ item.quantity }}"
+                   min="1"
+                   readonly>
+
+            <button type="button"
+            onclick="
+            letinput=this.previousElementSibling;
+            input.value=parseInt(input.value)+1;
+            this.form.submit();
+            ">
+                +
+            </button>
+
+        </form>
+
+        <!-- TOTAL -->
+        <div class="cart_total">
+            <div class="cart_total_qty">
+                {{ item.quantity }} x {{ item.product.price|vnd }}
+            </div>
+            <div class="cart_total_price">
+                {{ item.get_total|vnd }} VND
+            </div>
+        </div>
+
+        <!-- REMOVE -->
+        <a href="/remove/{{ item.id }}/"
+           class="remove_btn"
+           title="Xóa khỏi giỏ">
+            ✕
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+    <!-- SUMMARY -->
+    <div class="cart_summary">
+
+        <h4>
+            📋 Đơn hàng của bạn
+        </h4>
+
+        <div class="summary_row">
+            <span>📦 Số lượng sản phẩm</span>
+            <span>{{ items|length }} sản phẩm</span>
+        </div>
+
+        <div class="summary_row">
+            <span>🚚 Phí vận chuyển</span>
+            <span style="color: #27ae60;">Miễn phí</span>
+        </div>
+
+        <div class="summary_row total">
+            <span>💰 Tổng cộng</span>
+            <span>{{ total|vnd }} VND</span>
+        </div>
+
+        <a href="/checkout/" class="checkout_btn">
+            ✓ Tiến hành thanh toán
+        </a>
+
+    </div>
+
+{% else %}
+
+    <div class="empty_cart">
+
+        <h4>
+            🛒 Giỏ hàng trống
+        </h4>
+
+        <p>
+            Bạn chưa thêm sản phẩm nào vào giỏ hàng<br>
+            <small>Hãy thêm những sản phẩm yêu thích của bạn ngay!</small>
+        </p>
+
+        <a href="{% url 'home' %}"
+           class="checkout_btn">
+
+            ⬅ Tiếp tục mua sắm
+
+        </a>
+
+    </div>
+
+{% endif %}
+
+</div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="auth_section">
+  <div class="auth_container">
+    <!-- LEFT SIDE -->
+    <div class="auth_left">
+      <h1>SnackShop</h1>
+      <p>Tạo tài khoản để khám phá đồ ăn vặt ngon tuyệt vời</p>
+
+      <ul class="auth_features">
+        <li>Đặt hàng dễ dàng và nhanh chóng</li>
+        <li>Theo dõi đơn hàng thời gian thực</li>
+        <li>Nhận khuyến mãi độc quyền</li>
+        <li>Lịch sử mua hàng được lưu</li>
+      </ul>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="auth_card">
+      <h2>✍️ Đăng ký</h2>
+
+      <p class="auth_sub">Tạo tài khoản mới để bắt đầu</p>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- USERNAME -->
+        <div class="form_group">
+          <label>👤 Username</label>
+
+          <input
+            type="text"
+            name="username"
+            placeholder="Chọn tên đăng nhập"
+            required
+          />
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form_group">
+          <label>🔑 Password</label>
+
+          <div class="password_wrapper">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Nhập mật khẩu mạnh"
+              required
+              style="padding-right: 45px"
+            />
+
+            <span
+              class="password_toggle"
+              onclick="togglePassword('password', this)"
+            >
+              👁️
+            </span>
+          </div>
+        </div>
+
+        <!-- CONFIRM PASSWORD -->
+        <div class="form_group">
+          <label>🔐 Xác nhận mật khẩu</label>
+
+          <div class="password_wrapper">
+            <input
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
+              placeholder="Nhập lại mật khẩu"
+              required
+              style="padding-right: 45px"
+            />
+
+            <span
+              class="password_toggle"
+              onclick="togglePassword('confirm_password', this)"
+            >
+              👁️
+            </span>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        {% if error %}
+        <div class="auth_error">{{ error }}</div>
+        {% endif %}
+
+        <!-- BUTTON -->
+        <button type="submit" class="auth_btn">Đăng ký ngay</button>
+      </form>
+
+      <!-- FOOTER -->
+      <div class="auth_footer">
+        <span>Đã có tài khoản?</span>
+
+        <a href="{% url 'login' %}"> Đăng nhập ngay → </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOW / HIDE PASSWORD -->
+<script>
+  function togglePassword(id, element) {
+    const input = document.getElementById(id);
+
+    if (input.type === "password") {
+      input.type = "text";
+
+      element.innerHTML = "🙈";
+    } else {
+      input.type = "password";
+
+      element.innerHTML = "👁️";
+    }
+  }
+</script>
+
+{% endblock %}

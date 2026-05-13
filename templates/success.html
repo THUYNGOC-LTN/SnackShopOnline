@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+
+<section class="layout_padding">
+<div class="container d-flex justify-content-center">
+
+    <div class="box p-4 shadow text-center" style="max-width:520px; width:100%;">
+
+        <!-- ICON -->
+        <div class="mb-3">
+            <h1 class="text-success">✔</h1>
+        </div>
+
+        <!-- TITLE -->
+        <h3 class="text-success mb-2 fw-bold">
+            🎉 Đặt hàng thành công!
+        </h3>
+
+        <p class="text-muted mb-3">
+            Cảm ơn bạn đã mua hàng ❤️ <br>
+            Tự động chuyển sau 
+            <b id="countdown">3</b> giây...
+        </p>
+
+        <div class="progress mb-4" style="height:6px;">
+            <div id="progressBar" class="progress-bar bg-success" style="width:100%;"></div>
+        </div>
+
+        <!-- ORDER INFO -->
+        <div class="bg-light p-3 rounded mb-3 text-start">
+
+            <h5 class="mb-3 text-center">
+                📦 Đơn hàng #{{ order.id }}
+            </h5>
+
+            {% for item in items %}
+            <div class="d-flex justify-content-between border-bottom py-2 small">
+                <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                <span class="text-danger">
+                    {{ item.product.price|vnd }} VND
+                </span>
+            </div>
+            {% endfor %}
+
+            <div class="text-end mt-3">
+                <b class="text-danger fs-5">
+                    Tổng: {{ order.total_price|vnd }} VND
+                </b>
+            </div>
+
+        </div>
+
+        <!-- PAYMENT -->
+        {% if order.payment_method == "BANK" %}
+        <div class="alert alert-warning small">
+            ⚠️ Đơn hàng đang chờ xác nhận thanh toán
+        </div>
+
+        <a href="{% url 'confirm_payment' order.id %}"
+           class="order_online w-100 text-center mb-2">
+            💳 Tôi đã chuyển khoản
+        </a>
+        {% endif %}
+
+        <!-- MANUAL BUTTON -->
+        <a href="{% url 'orders' %}"
+           class="btn btn-outline-secondary w-100">
+            📜 Xem đơn hàng ngay
+        </a>
+
+    </div>
+
+</div>
+</section>
+
+<!-- AUTO REDIRECT -->
+<script>
+let timeLeft = 3;
+const countdown = document.getElementById("countdown");
+const progressBar = document.getElementById("progressBar");
+
+const totalTime = 3;
+
+const timer = setInterval(() => {
+    timeLeft--;
+    countdown.innerText = timeLeft;
+
+    // progress giảm dần
+    let percent = (timeLeft / totalTime) * 100;
+    progressBar.style.width = percent + "%";
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        window.location.href = "{% url 'orders' %}";
+    }
+}, 1000);
+</script>
+
+{% endblock %}

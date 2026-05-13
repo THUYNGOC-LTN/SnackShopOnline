@@ -1,0 +1,130 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- HERO -->
+{% block hero %}
+<div class="hero_area">
+  <div class="bg-box">
+    <img src="{% static 'images/hero-bg.jpg' %}" alt="hero" />
+  </div>
+
+  <section class="slider_section">
+    <div class="container text-center">
+      <div class="detail-box">
+        <h1>📚 Blog Snack Shop</h1>
+        <h2>Chia sẻ kiến thức thú vị về các loại snack</h2>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+<section class="food_section layout_padding">
+  <div class="container">
+    <!-- ADMIN CREATE BUTTON -->
+    {% if user.is_staff %}
+    <div class="mb-4">
+      <a href="{% url 'create_blog' %}" class="btn btn-success btn-lg">
+        ✍️ Viết bài mới
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- BLOG LIST -->
+    <div class="row">
+      {% if blogs %} {% for blog in blogs %}
+      <div class="col-lg-6 mb-5">
+        <div class="card h-100 shadow-sm">
+          <!-- IMAGE -->
+          <div class="position-relative">
+            {% if blog.image %}
+            <img
+              src="{{ blog.image.url }}"
+              class="card-img-top"
+              alt="{{ blog.title }}"
+              style="height: 250px; object-fit: cover"
+            />
+            {% else %}
+            <div
+              class="card-img-top"
+              style="
+                height: 250px;
+                background-color: #f1f2f3;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #999;
+              "
+            >
+              Không có ảnh
+            </div>
+            {% endif %}
+            <!-- DATE BADGE -->
+            <div
+              style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 5px;
+                font-size: 12px;
+              "
+            >
+              <strong>{{ blog.created_at|date:'d M' }}</strong><br />
+              <small>{{ blog.created_at|date:'Y' }}</small>
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="card-body">
+            <h5 class="card-title">{{ blog.title }}</h5>
+            <p class="card-text text-muted">
+              <small
+                >Snack Shop Biết Tuốt</small
+              >
+            </p>
+            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <a
+                href="{% url 'blog_detail' blog.id %}"
+                class="btn btn-warning btn-sm"
+              >
+                📖 Đọc tiếp
+              </a>
+              {% if user.is_staff and blog.author == user %}
+              <div>
+                <a
+                  href="{% url 'edit_blog' blog.id %}"
+                  class="btn btn-primary btn-sm"
+                  >✏️</a
+                >
+                <a
+                  href="{% url 'delete_blog' blog.id %}"
+                  class="btn btn-danger btn-sm"
+                  >🗑️</a
+                >
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <div class="col-12">
+        <div class="alert alert-info text-center" role="alert">
+          <h4>📭 Chưa có bài viết nào</h4>
+          <p>Hãy quay lại sau để xem các bài viết mới!</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

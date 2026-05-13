@@ -1,0 +1,91 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- HERO -->
+{% block hero %}
+<div class="hero_area">
+  <div class="bg-box">
+    <img src="{% static 'images/hero-bg.jpg' %}" alt="hero" />
+  </div>
+
+  <section class="slider_section">
+    <div class="container text-center">
+      <div class="detail-box">
+        <h1>{{ blog.title }}</h1>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+<section class="food_section layout_padding">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- BLOG IMAGE -->
+        {% if blog.image %}
+        <img
+          src="{{ blog.image.url }}"
+          alt="{{ blog.title }}"
+          class="img-fluid rounded mb-4"
+          style="max-height: 400px; object-fit: cover; width: 100%"
+        />
+        {% endif %}
+
+        <!-- BLOG META -->
+        <div class="mb-4 pb-3 border-bottom">
+          <small class="text-muted">
+            👤
+            <strong
+              >Snack Shop Biết Tuốt</strong
+            >
+            | 📅 {{ blog.created_at|date:'d/m/Y H:i' }}  
+          </small>
+        </div>
+
+        <!-- BLOG CONTENT -->
+        <div class="blog-content mb-4">{{ blog.content|linebreaks }}</div>
+
+        <!-- ADMIN ACTIONS -->
+        {% if user.is_staff and blog.author == user %}
+        <div class="mt-5 pt-4 border-top">
+          <a href="{% url 'edit_blog' blog.id %}" class="btn btn-primary">
+            ✏️ Chỉnh sửa
+          </a>
+          <a href="{% url 'delete_blog' blog.id %}" class="btn btn-danger">
+            🗑️ Xóa bài viết
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">🔗 Bài viết khác</h5>
+            <div class="list-group">
+              {% for other_blog in blogs %} {% if other_blog.id != blog.id %}
+              <a
+                href="{% url 'blog_detail' other_blog.id %}"
+                class="list-group-item list-group-item-action"
+              >
+                {{ other_blog.title|truncatewords:5 }}
+              </a>
+              {% endif %} {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="mt-5">
+      <a href="{% url 'blog_list' %}" class="btn btn-outline-secondary">
+        ← Quay lại danh sách blog
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

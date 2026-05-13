@@ -1,0 +1,152 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% load custom_filters %} 
+{% block content %}
+
+<section class="product_page">
+  <div class="container">
+    <div class="row g-5 product_box">
+      <!-- IMAGE -->
+      <div class="col-md-5 text-center">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="product_img" />
+        {% endif %}
+      </div>
+
+      <!-- INFO -->
+      <div class="col-md-7">
+        <h1 class="product_title">{{ product.name }}</h1>
+
+        <h2 class="product_price mb-3">{{ product.price|vnd }} VND</h2>
+
+        <p class="text-muted">{{ product.description }}</p>
+
+        <!-- RATING -->
+        <div class="mb-3">
+          {% if avg_rating %} ⭐ <b>{{ avg_rating|floatformat:1 }}/5</b>
+          {% else %}
+          <span class="text-muted">Chưa có đánh giá</span>
+          {% endif %}
+        </div>
+
+        <!-- BUTTON -->
+        {% if user.is_authenticated %}
+        <a href="{% url 'add_to_cart' product.id %}" class="btn_shop">
+          🛒 Thêm vào giỏ
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn_shop"> 🔐 Đăng nhập để mua </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <!-- REVIEW FORM -->
+    <h3 class="fw-bold mb-3">⭐ Đánh giá sản phẩm</h3>
+
+    {% if can_review %}
+
+    <form
+      method="POST"
+      action="{% url 'add_review' product.id %}"
+      class="review_card mb-4"
+      enctype="multipart/form-data"
+    >
+      {% csrf_token %}
+
+      <!-- STAR -->
+      <div class="mb-3">
+        <label class="fw-bold mb-2">Chọn số sao:</label><br />
+
+        {% for i in "54321" %}
+        <label class="me-3">
+          <input type="radio" name="rating" value="{{ i }}" required />
+          {{ i }} ⭐
+        </label>
+        {% endfor %}
+      </div>
+
+      <!-- COMMENT -->
+      <textarea
+        name="comment"
+        class="form-control mb-3"
+        placeholder="Viết nhận xét..."
+        required
+      ></textarea>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="mb-3">
+        <label class="fw-bold mb-2">📸 Thêm ảnh (Tùy chọn):</label>
+        <input type="file" name="image" class="form-control" accept="image/*" />
+        <small class="text-muted d-block mt-1"
+          >Tải lên ảnh chứng minh chất lượng sản phẩm</small
+        >
+      </div>
+
+      <button class="btn_shop">Gửi đánh giá</button>
+    </form>
+
+    {% elif user.is_authenticated %}
+    <div class="alert alert-warning">
+      ⚠️ Bạn cần mua sản phẩm trước khi đánh giá
+    </div>
+    {% else %}
+    <div class="alert alert-info">🔐 Đăng nhập để đánh giá</div>
+    {% endif %}
+
+    <!-- REVIEW LIST -->
+    <h3 class="fw-bold mb-3">📝 Nhận xét khách hàng</h3>
+
+    {% for r in reviews %}
+
+    <div class="review_card mb-3">
+      <div class="d-flex justify-content-between">
+        <h6 class="fw-bold">👤 {{ r.user.last_name }}</h6>
+
+        <!-- STAR FIX -->
+        <div>
+          {% for i in "12345" %} {% if forloop.counter <= r.rating %}
+          <span class="text-warning star">★</span>
+          {% else %}
+          <span class="text-secondary star">☆</span>
+          {% endif %} {% endfor %}
+        </div>
+      </div>
+
+      <p class="mb-0 text-muted">{{ r.comment }}</p>
+
+      <!-- REVIEW IMAGE -->
+      {% if r.image %}
+      <div class="review_image mt-2 mb-2">
+        <img
+          src="{{ r.image.url }}"
+          alt="Review image"
+          style="
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          "
+        />
+      </div>
+      {% endif %}
+
+      <small class="text-muted d-block mt-2">
+        📅 {{ r.created_at|date:"d/m/Y H:i" }}
+      </small>
+    </div>
+
+    {% empty %}
+    <p class="text-muted">Chưa có đánh giá nào</p>
+    {% endfor %}
+
+    <!-- BACK -->
+    <div class="text-center mt-4">
+      <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+        ⬅ Quay lại
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% load custom_filters %}
+{% block content %}
+<section class="orders_section">
+
+<div class="container">
+
+    <!-- TITLE -->
+    <h2 class="page_title">
+        📜 Đơn hàng của bạn
+    </h2>
+
+    {% if orders %}
+
+    <div class="row g-4">
+
+        {% for order in orders %}
+        <div class="col-lg-4 col-md-6">
+
+            <div class="order_card p-4 d-flex flex-column">
+
+                <!-- ORDER CODE -->
+                <div class="order_text">
+                    <b>🆔 Đơn hàng #{{ order.id }}</b>
+                </div>
+
+                <div class="order_text" style="font-size: 12px; color: #999;">
+                    {{ order.order_code }}
+                </div>
+
+                <!-- NAME -->
+                <div class="order_text mt-2">
+                    👤 <b>{{ order.fullname }}</b>
+                </div>
+
+                <!-- PHONE -->
+                <div class="order_text">
+                    📞 {{ order.phone }}
+                </div>
+
+                <!-- PRICE -->
+                <div class="order_price mt-3 mb-2">
+                    {{ order.total_price|vnd }} VND
+                </div>
+
+                <!-- STATUS -->
+                <div class="mb-3">
+
+                    {% if order.status == 'PENDING' %}
+                        <span class="badge_status bg-warning">
+                            ⏳ Chờ xử lý
+                        </span>
+
+                    {% elif order.status == 'CONFIRMED' %}
+                        <span class="badge_status bg-primary">
+                            ✓ Đã xác nhận
+                        </span>
+
+                    {% elif order.status == 'SHIPPING' %}
+                        <span class="badge_status bg-info">
+                            🚚 Đang giao
+                        </span>
+
+                    {% elif order.status == 'DELIVERED' %}
+                        <span class="badge_status bg-success">
+                            ✓ Đã giao
+                        </span>
+
+                    {% else %}
+                        <span class="badge_status bg-danger">
+                            ✕ Đã hủy
+                        </span>
+                    {% endif %}
+
+                </div>
+
+                <!-- PAYMENT -->
+                <div class="order_text mb-3">
+                    💳 <b>{{ order.get_payment_method_display|default:"Chuyển khoản" }}</b>
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="mt-auto d-grid gap-2">
+
+                    <a href="{% url 'order_detail' order.id %}"
+                       class="btn btn-primary btn-sm btn_custom">
+                        🔍 Chi tiết đơn hàng
+                    </a>
+
+                    {% if order.status == 'PENDING' or order.status == 'CONFIRMED' %}
+                    <a href="{% url 'cancel_order' order.id %}"
+                       onclick="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')"
+                       class="btn btn-outline-danger btn-sm btn_custom">
+                        ❌ Hủy đơn
+                    </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <!-- EMPTY -->
+    <div class="empty_box">
+        <h4>😢 Bạn chưa có đơn hàng nào</h4>
+        <p style="color: #999; margin-bottom: 25px;">Hãy thêm các sản phẩm yêu thích của bạn vào giỏ hàng và đặt hàng ngay!</p>
+        <a href="{% url 'home' %}" class="btn">
+            🛍 Bắt đầu mua sắm
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,125 @@
+{% load static %}
+
+<header class="header_section">
+  <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg custom_nav-container navbar-dark">
+      <!-- LOGO -->
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <span> SnackShop</span>
+      </a>
+
+      <!-- MOBILE BUTTON -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- MENU -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- ========================= -->
+        <!-- CENTER MENU -->
+        <!-- ========================= -->
+        <ul class="navbar-nav mx-auto">
+          <!-- HOME -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">  Trang chủ </a>
+          </li>
+
+          <!-- BLOG -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'blog_list' %}">  Blog </a>
+          </li>
+
+          {% if user.is_authenticated %}
+
+          <!-- ========================= -->
+          <!-- 👑 ADMIN -->
+          <!-- ========================= -->
+          {% if user.is_staff %}
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_dashboard' %}">
+               Dashboard
+            </a>
+          </li>
+
+          {% else %}
+
+          <!-- ========================= -->
+          <!-- 👤 USER -->
+          <!-- ========================= -->
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'cart' %}">
+              🛒 Giỏ hàng {% if cart_count > 0 %}
+              <span class="badge bg-warning text-dark"> {{ cart_count }} </span>
+              {% endif %}
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'orders' %}"> 📦 Đơn hàng </a>
+          </li>
+
+          {% endif %} {% endif %}
+        </ul>
+
+        <!-- ========================= -->
+        <!-- RIGHT -->
+        <!-- ========================= -->
+        <div class="user_option d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+
+          <!-- USER DROPDOWN -->
+          <div class="user_dropdown">
+            <span class="user_dropdown_btn">
+              <div class="navbar_avatar">
+                {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="Avatar" />
+                {% else %} 👤 {% endif %}
+              </div>
+              {{ user.last_name }}
+            </span>
+            <div class="dropdown_menu">
+              <a href="{% url 'profile' %}">👤 Hồ sơ</a>
+              <a href="{% url 'edit_profile' %}">✏️ Chỉnh sửa hồ sơ</a>
+              <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+            </div>
+          </div>
+
+          {% else %}
+
+          <!-- LOGIN -->
+          <a href="{% url 'login' %}" class="order_online"> 🔐 Đăng nhập </a>
+
+          <!-- REGISTER -->
+          <a href="{% url 'register' %}" class="order_online"> ✍️ Đăng ký </a>
+
+          {% endif %}
+
+          <!-- ========================= -->
+          <!-- CART ICON CHỈ USER -->
+          <!-- ========================= -->
+          {% if user.is_authenticated and not user.is_staff %}
+
+          <a class="cart_link" href="{% url 'cart' %}" title="Xem giỏ hàng">
+            🛒 {% if cart_count > 0 %}
+            <span class="badge"> {{ cart_count }} </span>
+            {% endif %}
+          </a>
+
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>

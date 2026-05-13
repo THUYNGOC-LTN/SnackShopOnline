@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- HERO -->
+{% block hero %}
+<div class="hero_area">
+  <div class="bg-box">
+    <img src="{% static 'images/hero-bg.jpg' %}" alt="hero" />
+  </div>
+
+  <section class="slider_section">
+    <div class="container text-center">
+      <div class="detail-box">
+        <h1>🗑️ Xóa bài blog</h1>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+<section class="food_section layout_padding">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 mx-auto">
+        <div class="card border-danger">
+          <div class="card-body text-center p-5">
+            <h3 class="card-title text-danger mb-4">
+              ⚠️ Xác nhận xóa bài viết
+            </h3>
+
+            <div class="alert alert-warning" role="alert">
+              <strong>Bạn có chắc chắn muốn xóa bài viết này?</strong>
+              <p class="mb-0 mt-2">Hành động này không thể hoàn tác!</p>
+            </div>
+
+            <h5 class="mb-3">{{ blog.title }}</h5>
+
+            <!-- BLOG IMAGE PREVIEW -->
+            {% if blog.image %}
+            <img
+              src="{{ blog.image.url }}"
+              class="img-thumbnail mb-3"
+              style="max-width: 100%"
+            />
+            {% endif %}
+
+            <!-- BUTTONS -->
+            <form method="POST" class="d-flex gap-2 justify-content-center">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-lg">
+                ✅ Xóa bài viết
+              </button>
+              <a
+                href="{% url 'blog_detail' blog.id %}"
+                class="btn btn-secondary btn-lg"
+              >
+                ❌ Hủy
+              </a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

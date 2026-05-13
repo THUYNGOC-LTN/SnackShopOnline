@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<section class="edit_section">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-6">
+
+                <div class="edit_card">
+
+                    <!-- TITLE -->
+                    <div class="text-center">
+
+                        <h1 class="edit_title">
+                          Sửa sản phẩm
+                        </h1>
+
+                        <p class="edit_subtitle">
+                            Cập nhật thông tin sản phẩm của cửa hàng
+                        </p>
+
+                    </div>
+
+                    <!-- IMAGE -->
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}"
+                             class="image_preview">
+                    {% endif %}
+
+                    <!-- FORM -->
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <!-- NAME -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                - Tên sản phẩm
+                            </label>
+
+                            {{ form.name }}
+
+                        </div>
+
+                        <!-- PRICE -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                - Giá sản phẩm:
+                            </label>
+
+                            {{ form.price }}
+
+                        </div>
+
+                        <!-- IMAGE -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                - Hình ảnh:
+                            </label>
+
+                            {{ form.image }}
+
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                📝 Mô tả sản phẩm
+                            </label>
+
+                            {{ form.description }}
+
+                        </div>
+
+                        <!-- BUTTON -->
+                        <button class="update_btn">
+
+                          Cập nhật sản phẩm
+
+                        </button>
+
+                    </form>
+
+                    <!-- BACK -->
+                    <a href="{% url 'admin_dashboard' %}"
+                       class="back_btn">
+
+                        ⬅ Quay lại Dashboard
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
