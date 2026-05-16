@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Q, Max
 from datetime import timedelta
 from django.utils import timezone
-from sympy import product
 from .models import ShopReview
 from django.http import JsonResponse
 
