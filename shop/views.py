@@ -17,57 +17,50 @@ from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewF
 # =========================
 def home(request):
 
-    # ADMIN -> dashboard riêng
+    # admin redirect
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('admin_dashboard')
 
     q = request.GET.get('q')
 
-    # PRODUCTS
+    # base query
     products = Product.objects.all().order_by('-id')
-
-    # CATEGORY
     categories = Category.objects.all()
 
-    # SEARCH
+    # search
     if q:
-        products = products.filter(
-            name__icontains=q
-        )
+        products = products.filter(name__icontains=q)
 
-    # BEST SELLERS
-    best_sellers = Product.objects.annotate(
-        total_sold=Count('orderitem')
-    ).filter(
-        total_sold__gt=0
-    ).order_by('-total_sold')[:4]
+    # best sellers (fix chắc chắn không lỗi nếu chưa có order)
+    best_sellers = (
+        Product.objects
+        .annotate(total_sold=Count('orderitem'))
+        .order_by('-total_sold')[:4]
+    )
 
-    # NEW PRODUCTS
-    new_products = Product.objects.all().order_by('-id')[:4]
+    # new products
+    new_products = Product.objects.order_by('-id')[:4]
 
-    # SHOP REVIEWS
+    # reviews
     shop_reviews = ShopReview.objects.all().order_by('-id')[:20]
 
-    # CART COUNT
-    cart_count = get_cart_count(request.user)
+    # cart count safe (tránh lỗi user anonymous)
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = get_cart_count(request.user)
 
-    return render(request, 'shop/home.html', {
-
+    context = {
         'products': products,
-
         'categories': categories,
-
         'selected_category': None,
-
         'best_sellers': best_sellers,
-
         'new_products': new_products,
-
         'shop_reviews': shop_reviews,
+        'cart_count': cart_count,
+        'q': q,
+    }
 
-        'cart_count': cart_count
-
-    })
+    return render(request, 'shop/home.html', context)
 # =========================
 # REGISTER
 # =========================
@@ -578,40 +571,51 @@ def category_products(request, category_id):
 # ALL PRODUCTS
 # =========================
 def all_products(request):
-    
-    # ADMIN -> dashboard riêng
+
+    # ADMIN redirect
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('admin_dashboard')
 
-    q = request.GET.get('q')
+    q = request.GET.get('q', '')
     sort = request.GET.get('sort', '-id')
     category_id = request.GET.get('category')
-    
+
     products = Product.objects.all()
     categories = Category.objects.all()
     selected_category = None
-    
-    # FILTER by category
+
+    # CATEGORY FILTER (safe)
     if category_id:
         selected_category = get_object_or_404(Category, id=category_id)
-        products = products.filter(category=selected_category)
-    
+        products = products.filter(category_id=category_id)
+
     # SEARCH
     if q:
         products = products.filter(name__icontains=q)
-    
-    # SORT
+
+    # SORT (safe version)
     if sort == 'best_seller':
-        products = products.annotate(total_sold=Count('orderitem')).order_by('-total_sold')
+        products = products.annotate(
+            total_sold=Count('orderitem')
+        ).order_by('-total_sold')
+
     elif sort == 'price_asc':
         products = products.order_by('price')
+
     elif sort == 'price_desc':
         products = products.order_by('-price')
+
+    elif sort == '-id':
+        products = products.order_by('-id')
+
     else:
-        products = products.order_by(sort)
-    
-    cart_count = get_cart_count(request.user)
-    
+        # tránh user truyền sort linh tinh gây lỗi
+        products = products.order_by('-id')
+
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = get_cart_count(request.user)
+
     return render(request, 'shop/products.html', {
         'products': products,
         'categories': categories,
@@ -620,7 +624,6 @@ def all_products(request):
         'sort': sort,
         'q': q
     })
-
 # =========================
 # PRODUCT DETAIL
 # =========================
