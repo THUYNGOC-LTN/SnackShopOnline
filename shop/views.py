@@ -19,8 +19,8 @@ def home(request):
 
     # admin redirect
     def admin_dashboard(request):
-    if not request.user.is_superuser:
-        return redirect('home')
+        if not request.user.is_superuser:
+         return redirect('home')
 
     q = request.GET.get('q')
 
