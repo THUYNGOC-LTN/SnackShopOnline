@@ -177,10 +177,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = timedelta(minutes=15)
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 999999  # gần như không lock
+AXES_COOLOFF_TIME = 0
 AXES_RESET_ON_SUCCESS = True
-
 # ========================
 # DEFAULT PRIMARY KEY
 # ========================
