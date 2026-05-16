@@ -1,0 +1,690 @@
+{% extends 'base.html' %} {% load static %} {% load custom_filters %}
+
+<!-- HERO -->
+{% block hero %}
+<div class="hero_area">
+  <div class="bg-box">
+    <img src="{% static 'images/hero-bg.jpg' %}" alt="hero" />
+  </div>
+
+  <section class="slider_section">
+    <div class="container text-center">
+      <div class="detail-box">
+        <h1>SnackShop </h1>
+
+        <h2>Thiên đường đồ ăn vặt dành cho bạn</h2>
+
+        <!-- SEARCH -->
+        <form method="GET" class="d-flex justify-content-center">
+          <input
+            type="text"
+            name="q"
+            value="{{ request.GET.q }}"
+            placeholder="Hãy nhập tên sản phẩm cần tìm..."
+            class="form-control"
+          />
+          <button type="submit" class="btn btn-warning ms-2">🔍</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+<section class="about_snackshop">
+  <div class="container">
+
+    <div class="row align-items-center">
+
+      <!-- LEFT -->
+      <div class="col-lg-5 text-center">
+
+        <img
+          src="{% static 'images/logo1.gif' %}"
+          alt="SnackShop"
+          class="snackshop_logo"
+        >
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="col-lg-7">
+
+        <div class="about_content">
+
+          <h2 class="about_title">
+            SNACKSHOP
+          </h2>
+
+          <div class="about_line"></div>
+
+          <p class="about_desc">
+            SnackShop là cửa hàng chuyên cung cấp các loại đồ ăn vặt,
+            bánh tráng, snack, nước uống và các món hot trend được giới trẻ yêu thích.
+
+            Với tiêu chí ngon - sạch - giá hợp lý,
+            SnackShop luôn mang đến trải nghiệm mua sắm tiện lợi
+            cùng hàng trăm sản phẩm hấp dẫn dành cho học sinh, sinh viên và dân văn phòng.
+          </p>
+
+          <!-- STATS -->
+          <!-- STATS -->
+<div class="about_stats">
+
+  <div class="stat_item">
+
+    <div class="stat_icon">
+      <i class="fa fa-cutlery"></i>
+    </div>
+
+    <h3>100+</h3>
+    <p>Sản phẩm ăn vặt</p>
+
+  </div>
+
+  <div class="stat_item">
+
+    <div class="stat_icon">
+      <i class="fa fa-users"></i>
+    </div>
+
+    <h3>10K+</h3>
+    <p>Khách hàng</p>
+
+  </div>
+
+  <div class="stat_item">
+
+    <div class="stat_icon">
+      <i class="fa fa-phone"></i>
+    </div>
+
+    <h3>24/7</h3>
+    <p>Hỗ trợ đặt hàng</p>
+
+  </div>
+
+</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- BEST SELLER SECTION -->
+<section class="food_section">
+  <div class="container">
+    <div class="heading_container heading_center mb-4">
+      <h2>🏆 Sản phẩm bán chạy</h2>
+    </div>
+
+    {% if best_sellers %}
+    <div class="row">
+      {% for p in best_sellers %}
+      <div class="col-sm-6 col-lg-3 mb-5">
+        <div class="box">
+          <!-- IMAGE -->
+          <div class="img-box">
+            {% if p.image %}
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
+            {% else %}
+            <div
+              style="
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #999;
+                font-weight: 600;
+              "
+            >
+              Không có ảnh
+            </div>
+            {% endif %}
+            <!-- BEST SELLER BADGE -->
+            <div
+              style="
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+                color: #333;
+                padding: 8px 12px;
+                border-radius: 50%;
+                width: 70px;
+                height: 70px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                text-align: center;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                font-size: 12px;
+                line-height: 1.2;
+              "
+            >
+              <span style="font-size: 18px; margin-bottom: 2px">⭐</span>
+              <span>BEST<br />SELLER</span>
+            </div>
+          </div>
+
+          <!-- DETAIL -->
+          <div class="detail-box">
+            <div>
+              <h5>
+                <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
+              </h5>
+              <h6>{{ p.price|vnd }} VND</h6>
+            </div>
+
+            <div>
+              {% if user.is_authenticated %}
+              <a
+                href="{% url 'add_to_cart' p.id %}"
+                class="btn btn-warning w-100"
+              >
+                🛒 Thêm vào giỏ
+              </a>
+              {% else %}
+              <a href="{% url 'login' %}" class="btn btn-light w-100">
+                🔐 Đăng nhập
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- NEW PRODUCTS SECTION -->
+<section class="food_section" style="background-color: #f9f9f9">
+
+  <div class="container">
+
+    <div class="heading_container heading_center mb-4">
+      <h2>🏆 Sản phẩm mới</h2>
+    </div>
+
+    {% if new_products %}
+
+    <div class="row">
+
+      {% for p in new_products %}
+
+      <div class="col-sm-6 col-lg-3 mb-5">
+            <div class="box">
+              <!-- IMAGE -->
+              <div class="img-box">
+                {% if p.image %}
+                <img src="{{ p.image.url }}" alt="{{ p.name }}" />
+                {% else %}
+                <div
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #999;
+                    font-weight: 600;
+                  "
+                >
+                  Không có ảnh
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- DETAIL -->
+              <div class="detail-box">
+                <div>
+                  <h5>
+                    <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
+                  </h5>
+                  <h6>{{ p.price|vnd }} VND</h6>
+                </div>
+
+                <div>
+                  {% if user.is_authenticated %}
+                  <a
+                    href="{% url 'add_to_cart' p.id %}"
+                    class="btn btn-warning w-100"
+                  >
+                    🛒 Thêm vào giỏ
+                  </a>
+                  {% else %}
+                  <a href="{% url 'login' %}" class="btn btn-light w-100">
+                    🔐 Đăng nhập
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="food_section">
+  <div class="container">
+    <!-- CATEGORY -->
+    <div class="category_wrapper">
+      <div class="heading_container heading_center mb-4">
+        <h2>✨ Danh mục sản phẩm</h2>
+      </div>
+      <div class="text-center mb-5">
+        <a href="{% url 'all_products' %}" class="view_all_btn">
+        Xem tất cả sản phẩm →
+        </a>
+      </div>
+
+      <div class="category_menu">
+        <!-- CATEGORY -->
+        {% for c in categories|slice:":8"  %}
+
+        <a
+          href="{% url 'category_products' c.id %}"
+          class="category_btn {% if selected_category.id == c.id %}active_category{% endif %}"
+        >
+          {{ c.name }}
+        </a>
+
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="row">
+      {% for p in products|slice:":8" %}
+
+      <div class="col-sm-6 col-lg-3 mb-5">
+        <div class="box">
+          <!-- IMAGE -->
+          <div class="img-box">
+            {% if p.image %}
+
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
+
+            {% else %}
+
+            <div
+              style="
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #999;
+                font-weight: 600;
+              "
+            >
+              Không có ảnh
+            </div>
+
+            {% endif %}
+          </div>
+
+          <!-- DETAIL -->
+          <div class="detail-box">
+            <div>
+              <h5>
+                <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
+              </h5>
+
+              <h6>{{ p.price|vnd }} VND</h6>
+            </div>
+
+            <div>
+              {% if user.is_authenticated %}
+
+              <a
+                href="{% url 'add_to_cart' p.id %}"
+                class="btn btn-warning w-100"
+              >
+                🛒 Thêm vào giỏ
+              </a>
+
+              {% else %}
+
+              <a href="{% url 'login' %}" class="btn btn-light w-100">
+                🔐 Đăng nhập
+              </a>
+
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% empty %}
+
+      <div class="col-12">
+        <div class="no-products">
+          <h2>❌ Không có sản phẩm</h2>
+
+          <p>Hãy quay lại sau để xem các sản phẩm mới!</p>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- ========================= -->
+<!-- SHOP REVIEWS -->
+<!-- ========================= -->
+
+<section class="shop_review_section">
+
+  <div class="container">
+
+    <div class="review_wrapper">
+
+      <!-- ================= LEFT ================= -->
+      <div class="review_showcase">
+
+        <div class="review_title">
+          <h2>💬 Khách hàng nói gì?</h2>
+          <p>
+            Những đánh giá chân thật từ khách hàng SnackShop
+          </p>
+        </div>
+
+        <!-- AUTO SCROLL -->
+        <div class="review_stack">
+
+          <div class="review_stack_inner">
+
+            <!-- LOOP 1 -->
+            {% for r in shop_reviews %}
+
+            <div class="review_card">
+
+              <div class="review_top">
+
+                <div class="review_avatar">
+                  {{ r.user.username|slice:":1" }}
+                </div>
+
+                <div>
+
+                  <h5>
+                    {{ r.user.username }}
+                  </h5>
+
+                  <div class="review_stars">
+
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= r.rating %}
+                        ⭐
+                      {% endif %}
+                    {% endfor %}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <p class="review_text">
+                "{{ r.message }}"
+              </p>
+
+            </div>
+
+            {% endfor %}
+
+
+            <!-- DUPLICATE -->
+            {% for r in shop_reviews %}
+
+            <div class="review_card">
+
+              <div class="review_top">
+
+                <div class="review_avatar">
+                  {{ r.user.username|slice:":1" }}
+                </div>
+
+                <div>
+
+                  <h5>
+                    {{ r.user.username }}
+                  </h5>
+
+                  <div class="review_stars">
+
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= r.rating %}
+                        ⭐
+                      {% endif %}
+                    {% endfor %}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <p class="review_text">
+                "{{ r.message }}"
+              </p>
+
+            </div>
+
+            {% endfor %}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ================= RIGHT ================= -->
+      <div class="review_form_box">
+
+        <h2>✨ Đánh giá cửa hàng</h2>
+
+        <p>
+          Chia sẻ trải nghiệm của bạn với SnackShop
+        </p>
+
+        {% if user.is_authenticated %}
+
+        <!-- AJAX FORM -->
+        <form id="shopReviewForm">
+
+          {% csrf_token %}
+
+          <!-- RATING -->
+          <div class="form_group">
+
+            <label>⭐ Rating</label>
+
+            <select
+              name="rating"
+              class="review_select"
+            >
+
+              <option value="5">
+                ⭐⭐⭐⭐⭐
+              </option>
+
+              <option value="4">
+                ⭐⭐⭐⭐
+              </option>
+
+              <option value="3">
+                ⭐⭐⭐
+              </option>
+
+              <option value="2">
+                ⭐⭐
+              </option>
+
+              <option value="1">
+                ⭐
+              </option>
+
+            </select>
+
+          </div>
+
+          <!-- MESSAGE -->
+          <div class="form_group">
+
+            <label>
+              💭 Nội dung đánh giá
+            </label>
+
+            <textarea
+              name="message"
+              rows="5"
+              placeholder="Viết cảm nhận của bạn..."
+              required
+            ></textarea>
+
+          </div>
+
+          <!-- BUTTON -->
+          <button
+            type="submit"
+            class="submit_review_btn"
+          >
+            🚀 Gửi đánh giá
+          </button>
+
+        </form>
+
+        {% else %}
+
+        <!-- LOGIN REQUIRED -->
+        <div class="review_login_require">
+
+          <h4>
+            🔒 Bạn cần đăng nhập
+          </h4>
+
+          <p>
+            Đăng nhập để gửi đánh giá cho SnackShop
+          </p>
+
+          <a
+            href="{% url 'login' %}"
+            class="review_login_btn"
+          >
+            Đăng nhập ngay
+          </a>
+
+        </div>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================= -->
+<!-- AJAX REVIEW -->
+<!-- ========================= -->
+
+<script>
+
+const form = document.getElementById("shopReviewForm");
+
+if(form){
+
+  form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const response = await fetch("{% url 'add_shop_review' %}", {
+
+      method: "POST",
+
+      body: formData,
+
+      headers:{
+        "X-Requested-With":"XMLHttpRequest"
+      }
+
+    });
+
+    const data = await response.json();
+
+    if(data.success){
+
+      const stars = "⭐".repeat(data.rating);
+
+      const html = `
+
+      <div class="review_card new_review">
+
+        <div class="review_top">
+
+          <div class="review_avatar">
+            ${data.username.charAt(0)}
+          </div>
+
+          <div>
+
+            <h5>
+              ${data.username}
+            </h5>
+
+            <div class="review_stars">
+              ${stars}
+            </div>
+
+          </div>
+
+        </div>
+
+        <p class="review_text">
+          "${data.message}"
+        </p>
+
+      </div>
+
+      `;
+
+      const stack = document.querySelector(".review_stack_inner");
+
+      stack.insertAdjacentHTML(
+        "afterbegin",
+        html
+      );
+
+      form.reset();
+
+    }
+
+  });
+
+}
+
+</script>
+
+{% endblock %}

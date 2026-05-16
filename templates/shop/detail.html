@@ -17,10 +17,13 @@
       <div class="col-md-7">
         <h1 class="product_title">{{ product.name }}</h1>
 
-        <h2 class="product_price mb-3">{{ product.price|vnd }} VND</h2>
+        <h2 class="product_price mb-3">{{ product.price|vnd }} </h2>
 
         <p class="text-muted">{{ product.description }}</p>
-
+      
+      <div class="sold_text">
+        Đã bán {{ product.sold_count }} 
+      </div>
         <!-- RATING -->
         <div class="mb-3">
           {% if avg_rating %} ⭐ <b>{{ avg_rating|floatformat:1 }}/5</b>

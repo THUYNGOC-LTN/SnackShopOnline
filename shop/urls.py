@@ -34,4 +34,10 @@ urlpatterns = [
     path('blog/create/', views.create_blog, name='create_blog'),
     path('blog/<int:blog_id>/edit/', views.edit_blog, name='edit_blog'),
     path('blog/<int:blog_id>/delete/', views.delete_blog, name='delete_blog'),
+    path('products/', views.all_products, name='all_products'),
+    path(
+    'shop-review/',
+    views.add_shop_review,
+    name='add_shop_review'
+),
 ]

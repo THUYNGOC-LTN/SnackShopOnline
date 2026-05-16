@@ -1,0 +1,106 @@
+{% extends 'base.html' %} {% load static %} {% load custom_filters %}   
+{% block content %}
+
+<section class="products_page">
+  <div class="container py-5">
+    <div class="products_layout">
+      <!-- SIDEBAR FILTER -->
+      <div class="products_sidebar">
+        <h3>🎯 Bộ lọc sản phẩm</h3>
+
+        <!-- CATEGORY -->
+        <div class="filter_group">
+          <h5>Danh mục</h5>
+
+          <div class="products_categories">
+            <a
+              href="{% url 'all_products' %}"
+              class="{% if not selected_category %}active_cat{% endif %}"
+            >
+              Tất cả
+            </a>
+
+            {% for c in categories %}
+            <a
+              href="?category={{ c.id }}"
+              class="{% if selected_category.id == c.id %}active_cat{% endif %}"
+            >
+              {{ c.name }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- SORT -->
+        <div class="filter_group mt-4">
+          <h5>Sắp xếp</h5>
+
+          <div class="products_categories">
+            <a href="?sort=best_seller"> 🔥 Bán chạy </a>
+
+            <a href="?sort=-id"> ✨ Hàng mới </a>
+
+            <a href="?sort=price_asc"> 💰 Giá thấp → cao </a>
+
+            <a href="?sort=price_desc"> 💎 Giá cao → thấp </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="products_content">
+        <!-- FILTER -->
+        <div class="products_topbar">
+          <a href="?sort=best_seller"> Bán chạy </a>
+
+          <a href="?sort=-id"> Hàng mới </a>
+
+          <a href="?sort=price_asc"> Giá thấp đến cao </a>
+
+          <a href="?sort=price_desc"> Giá cao đến thấp </a>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="row">
+          {% for p in products %}
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div class="product_card">
+              <!-- IMAGE -->
+              <div class="product_img">
+                {% if p.image %}
+                <img src="{{ p.image.url }}" />
+                {% endif %}
+
+                <div class="product_overlay">
+                  <a href="{% url 'product_detail' p.id %}"> Xem chi tiết </a>
+                </div>
+              </div>
+
+              <!-- INFO -->
+              <div class="product_info">
+                <h5>{{ p.name }}</h5>
+
+                <span> {{ p.price|vnd }} ₫ </span>
+
+                <div class="product_actions">
+                  <a href="{% url 'product_detail' p.id %}" class="detail_btn">
+                    Chi tiết
+                  </a>
+
+                  {% if user.is_authenticated %}
+                  <a href="{% url 'add_to_cart' p.id %}" class="cart_btn">
+                    🛒
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

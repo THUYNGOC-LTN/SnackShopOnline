@@ -31,12 +31,12 @@
         <ul class="navbar-nav mx-auto">
           <!-- HOME -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'home' %}">  Trang chủ </a>
+            <a class="nav-link" href="{% url 'home' %}"> Trang chủ </a>
           </li>
 
           <!-- BLOG -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'blog_list' %}">  Blog </a>
+            <a class="nav-link" href="{% url 'blog_list' %}"> Blog </a>
           </li>
 
           {% if user.is_authenticated %}
@@ -48,7 +48,7 @@
 
           <li class="nav-item">
             <a class="nav-link" href="{% url 'admin_dashboard' %}">
-               Dashboard
+              Dashboard
             </a>
           </li>
 
@@ -59,15 +59,11 @@
           <!-- ========================= -->
 
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'cart' %}">
-              🛒 Giỏ hàng {% if cart_count > 0 %}
-              <span class="badge bg-warning text-dark"> {{ cart_count }} </span>
-              {% endif %}
-            </a>
+            <a class="nav-link" href="{% url 'all_products' %}"> Menu </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'orders' %}"> 📦 Đơn hàng </a>
+            <a class="nav-link" href="{% url 'orders' %}"> Đơn hàng </a>
           </li>
 
           {% endif %} {% endif %}
@@ -90,19 +86,19 @@
               {{ user.last_name }}
             </span>
             <div class="dropdown_menu">
-              <a href="{% url 'profile' %}">👤 Hồ sơ</a>
-              <a href="{% url 'edit_profile' %}">✏️ Chỉnh sửa hồ sơ</a>
-              <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+              <a href="{% url 'profile' %}"> Hồ sơ</a>
+              <a href="{% url 'edit_profile' %}"> Chỉnh sửa hồ sơ</a>
+              <a href="{% url 'logout' %}"> Đăng xuất</a>
             </div>
           </div>
 
           {% else %}
 
           <!-- LOGIN -->
-          <a href="{% url 'login' %}" class="order_online"> 🔐 Đăng nhập </a>
+          <a href="{% url 'login' %}" class="order_online"> Đăng nhập </a>
 
           <!-- REGISTER -->
-          <a href="{% url 'register' %}" class="order_online"> ✍️ Đăng ký </a>
+          <a href="{% url 'register' %}" class="order_online"> Đăng ký </a>
 
           {% endif %}
 

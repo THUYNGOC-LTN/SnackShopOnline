@@ -6,6 +6,9 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Q, Max
 from datetime import timedelta
 from django.utils import timezone
+from sympy import product
+from .models import ShopReview
+from django.http import JsonResponse
 
 from .models import Category, Product, Cart, CartItem, Order, OrderItem, Review, UserProfile, Blog
 from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewForm, BlogForm
@@ -21,35 +24,51 @@ def home(request):
 
     q = request.GET.get('q')
 
+    # PRODUCTS
     products = Product.objects.all().order_by('-id')
+
+    # CATEGORY
     categories = Category.objects.all()
 
     # SEARCH
     if q:
-        products = products.filter(name__icontains=q)
+        products = products.filter(
+            name__icontains=q
+        )
 
-    # GET BEST SELLERS (Top 4 most ordered products)
+    # BEST SELLERS
     best_sellers = Product.objects.annotate(
         total_sold=Count('orderitem')
     ).filter(
         total_sold__gt=0
     ).order_by('-total_sold')[:4]
 
-    # GET NEW PRODUCTS (Last 4 products added)
+    # NEW PRODUCTS
     new_products = Product.objects.all().order_by('-id')[:4]
+
+    # SHOP REVIEWS
+    shop_reviews = ShopReview.objects.all().order_by('-id')[:20]
 
     # CART COUNT
     cart_count = get_cart_count(request.user)
 
-    return render(request, 'home.html', {
-        'products': products,
-        'categories': categories,
-        'selected_category': None,
-        'best_sellers': best_sellers,
-        'new_products': new_products,
-        'cart_count': cart_count
-    })
+    return render(request, 'shop/home.html', {
 
+        'products': products,
+
+        'categories': categories,
+
+        'selected_category': None,
+
+        'best_sellers': best_sellers,
+
+        'new_products': new_products,
+
+        'shop_reviews': shop_reviews,
+
+        'cart_count': cart_count
+
+    })
 # =========================
 # REGISTER
 # =========================
@@ -61,13 +80,13 @@ def register(request):
 
         # CHECK mật khẩu không khớp
         if password != confirm_password:
-            return render(request, 'register.html', {
+            return render(request, 'auth/register.html', {
                 'error': 'Mật khẩu không khớp'
             })
 
         # CHECK username tồn tại
         if User.objects.filter(username=username).exists():
-            return render(request, 'register.html', {
+            return render(request, 'auth/register.html', {
                 'error': 'Username đã tồn tại'
             })
 
@@ -76,7 +95,7 @@ def register(request):
 
         return redirect('login')
 
-    return render(request, 'register.html')
+    return render(request, 'auth/register.html')
 
 # =========================
 # LOGIN
@@ -96,11 +115,11 @@ def user_login(request):
                 return redirect('admin_dashboard')
             return redirect('home')
 
-        return render(request, 'login.html', {
+        return render(request, 'auth/login.html', {
             'error': 'Sai tài khoản hoặc mật khẩu'
         })
 
-    return render(request, 'login.html')
+    return render(request, 'auth/login.html')
 
 
 # =========================
@@ -299,6 +318,15 @@ def checkout(request):
                 price=item.product.price
 
             )
+        # =========================
+        # TĂNG SỐ LƯỢNG ĐÃ BÁN
+        # =========================
+        for item in items:
+            product = item.product
+            product.sold_count += item.quantity
+
+        for item in items:
+            item.product.save()
 
         # =========================
         # XÓA GIỎ HÀNG
@@ -328,7 +356,7 @@ def checkout(request):
     # =========================
     return render(
         request,
-        'checkout.html',
+        'shop/checkout.html',
         {
             'items': items,
             'total': total
@@ -366,7 +394,7 @@ def blog_list(request):
     """Hiển thị danh sách các bài viết blog"""
     blogs = Blog.objects.all()
     
-    return render(request, 'blog_list.html', {
+    return render(request, 'blog/list.html', {
         'blogs': blogs,
         'cart_count': get_cart_count(request.user)
     })
@@ -376,7 +404,7 @@ def blog_detail(request, blog_id):
     """Hiển thị chi tiết bài viết blog"""
     blog = get_object_or_404(Blog, id=blog_id)
     
-    return render(request, 'blog_detail.html', {
+    return render(request, 'blog/detail.html', {
         'blog': blog,
         'cart_count': get_cart_count(request.user)
     })
@@ -399,7 +427,7 @@ def create_blog(request):
     else:
         form = BlogForm()
     
-    return render(request, 'create_blog.html', {
+    return render(request, 'blog/create.html', {
         'form': form,
         'cart_count': get_cart_count(request.user)
     })
@@ -422,7 +450,7 @@ def edit_blog(request, blog_id):
     else:
         form = BlogForm(instance=blog)
     
-    return render(request, 'edit_blog.html', {
+    return render(request, 'blog/edit_blog.html', {
         'form': form,
         'blog': blog,
         'cart_count': get_cart_count(request.user)
@@ -442,7 +470,7 @@ def delete_blog(request, blog_id):
         messages.success(request, '✅ Bài viết được xóa thành công!')
         return redirect('blog_list')
     
-    return render(request, 'delete_blog.html', {
+    return render(request, 'blog/delete_blog.html', {
         'blog': blog,
         'cart_count': get_cart_count(request.user)
     })
@@ -454,7 +482,7 @@ def order_success(request, order_code):
 
     order = Order.objects.get(order_code=order_code)
 
-    return render(request, "order_success.html", {
+    return render(request, "orders/success.html", {
         "order": order
     })
 
@@ -464,7 +492,7 @@ def order_success(request, order_code):
 @login_required
 def order_history(request):
     orders = Order.objects.filter(user=request.user).order_by('-id')
-    return render(request, 'orders.html', {'orders': orders})
+    return render(request, 'orders/list.html', {'orders': orders})
 
 
 # =========================
@@ -475,7 +503,7 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     items = OrderItem.objects.filter(order=order)
 
-    return render(request, 'order_detail.html', {
+    return render(request, 'orders/detail.html', {
         'order': order,
         'items': items
     })
@@ -490,7 +518,7 @@ def user_profile(request):
     orders = Order.objects.filter(user=user).order_by('-created_at')
     user_profile, created = UserProfile.objects.get_or_create(user=user)
     
-    return render(request, 'profile.html', {
+    return render(request, 'auth/profile.html', {
         'user': user,
         'user_profile': user_profile,
         'orders': orders
@@ -518,7 +546,7 @@ def edit_profile(request):
         user_form = UserProfileForm(instance=request.user)
         avatar_form = UserProfilePictureForm(instance=user_profile)
     
-    return render(request, 'edit_profile.html', {
+    return render(request, 'auth/edit_profile.html', {
         'form': user_form,
         'avatar_form': avatar_form
     })
@@ -548,6 +576,53 @@ def category_products(request, category_id):
     })
 
 # =========================
+# ALL PRODUCTS
+# =========================
+def all_products(request):
+    
+    # ADMIN -> dashboard riêng
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    q = request.GET.get('q')
+    sort = request.GET.get('sort', '-id')
+    category_id = request.GET.get('category')
+    
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    selected_category = None
+    
+    # FILTER by category
+    if category_id:
+        selected_category = get_object_or_404(Category, id=category_id)
+        products = products.filter(category=selected_category)
+    
+    # SEARCH
+    if q:
+        products = products.filter(name__icontains=q)
+    
+    # SORT
+    if sort == 'best_seller':
+        products = products.annotate(total_sold=Count('orderitem')).order_by('-total_sold')
+    elif sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    else:
+        products = products.order_by(sort)
+    
+    cart_count = get_cart_count(request.user)
+    
+    return render(request, 'shop/products.html', {
+        'products': products,
+        'categories': categories,
+        'selected_category': selected_category,
+        'cart_count': cart_count,
+        'sort': sort,
+        'q': q
+    })
+
+# =========================
 # PRODUCT DETAIL
 # =========================
 def product_detail(request, product_id):
@@ -563,7 +638,7 @@ def product_detail(request, product_id):
             product=product
         ).exists()
 
-    return render(request, 'product_detail.html', {
+    return render(request, 'shop/detail.html', {
         'product': product,
         'reviews': reviews,
         'can_review': can_review,
@@ -608,7 +683,7 @@ def add_review(request, product_id):
 def payment_qr(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
-    return render(request, 'payment_qr.html', {
+    return render(request, 'orders/payment_qr.html', {
         'order': order
     })
 
@@ -689,12 +764,12 @@ def admin_dashboard(request):
             )
 
     # DANH SÁCH SẢN PHẨM
-    products = Product.objects.all().order_by('-id')  
+    products = Product.objects.all().order_by('-id')[:8] 
     orders = Order.objects.all().order_by('-id')
 
     return render(
         request,
-        'admin_dashboard.html',
+        'admin/dashboard.html',
         {
 
             'total_products': total_products,
@@ -815,7 +890,7 @@ def edit_product(request, id):
             instance=product
         )
 
-    return render(request, 'edit_product.html', {
+    return render(request, 'shop/edit_product.html', {
         'form': form,
         'product': product
     })
@@ -860,3 +935,28 @@ def decrease_cart(request, item_id):
         item.delete()
 
     return redirect('cart')
+
+@login_required
+def add_shop_review(request):
+
+    if request.method == "POST":
+
+        rating = request.POST.get("rating")
+        message = request.POST.get("message")
+
+        review = ShopReview.objects.create(
+            user=request.user,
+            rating=rating,
+            message=message
+        )
+
+        return JsonResponse({
+            "success": True,
+            "username": review.user.username,
+            "rating": review.rating,
+            "message": review.message
+        })
+
+    return JsonResponse({
+        "success": False
+    })

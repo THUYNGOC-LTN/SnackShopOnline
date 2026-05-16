@@ -38,9 +38,9 @@
           <small class="text-muted">
             👤
             <strong
-              >Snack Shop Biết Tuốt</strong
+              >{{ user.get_full_name|default:blog.author.username }}</strong
             >
-            | 📅 {{ blog.created_at|date:'d/m/Y H:i' }}  
+            | 📅 {{ blog.created_at|date:'d/m/Y H:i' }} 
           </small>
         </div>
 

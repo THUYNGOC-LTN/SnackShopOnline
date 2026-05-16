@@ -39,6 +39,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/')
 
     description = models.TextField()
+    sold_count = models.PositiveIntegerField(default=0)
 
     category = models.ForeignKey(
         Category,
@@ -241,3 +242,22 @@ class Blog(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+# =========================
+# SHOP REVIEW
+# =========================
+class ShopReview(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    message = models.TextField()
+
+    rating = models.IntegerField(default=5)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
