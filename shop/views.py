@@ -18,8 +18,9 @@ from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewF
 def home(request):
 
     # admin redirect
-    if request.user.is_authenticated and request.user.is_staff:
-        return redirect('admin_dashboard')
+    def admin_dashboard(request):
+    if not request.user.is_superuser:
+        return redirect('home')
 
     q = request.GET.get('q')
 
@@ -93,26 +94,27 @@ def register(request):
 # LOGIN
 # =========================
 def user_login(request):
-    if request.method == 'POST':
-        user = authenticate(
-            request,
-            username=request.POST['username'],
-            password=request.POST['password']
-        )
+    if request.method == "POST":
 
-        if user:
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request=request, username=username, password=password)
+
+        if user is not None:
             login(request, user)
 
-            if user.is_staff:
-                return redirect('admin_dashboard')
-            return redirect('home')
+            # 🔥 phân quyền rõ ràng
+            if user.is_superuser or user.is_staff:
+                return redirect("admin_dashboard")
 
-        return render(request, 'auth/login.html', {
-            'error': 'Sai tài khoản hoặc mật khẩu'
+            return redirect("home")
+
+        return render(request, "auth/login.html", {
+            "error": "Sai tài khoản hoặc mật khẩu"
         })
 
-    return render(request, 'auth/login.html')
-
+    return render(request, "auth/login.html")
 
 # =========================
 # LOGOUT
@@ -723,7 +725,7 @@ def cancel_order(request, order_id):
 @login_required
 def admin_dashboard(request):
 
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('home')
 
     # THỐNG KÊ

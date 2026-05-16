@@ -55,9 +55,10 @@ MIDDLEWARE = [
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'axes.middleware.AxesMiddleware',
 
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'axes.middleware.AxesMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'snackshop.urls'
@@ -178,9 +179,9 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AXES_ENABLED = True
-AXES_FAILURE_LIMIT = 999999  # gần như không lock
-AXES_COOLOFF_TIME = 0
-AXES_RESET_ON_SUCCESS = True
+AXES_FAILURE_LIMIT = 10
+AXES_COOLOFF_TIME = 1
+AXES_LOCKOUT_CALLABLE = None
 # ========================
 # DEFAULT PRIMARY KEY
 # ========================
