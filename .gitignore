@@ -1,0 +1,47 @@
+# ENV
+.env
+
+# PYTHON
+__pycache__/
+*.py[cod]
+*$py.class
+
+# DJANGO
+db.sqlite3
+media/
+staticfiles/
+
+# VENV
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LOGS
+*.log
+
+# MIGRATIONS CACHE
+*.sqlite3
+
+# PYTEST
+.pytest_cache/
+
+# MYPY
+.mypy_cache/
+
+# NODE
+node_modules/
+
+# SECRET FILES
+secrets.json
+credentials.json
+
+# CLOUDINARY
+cloudinary_url.txt
