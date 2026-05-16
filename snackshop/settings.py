@@ -16,10 +16,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "127.0.0.1,localhost"
-).split(",")
+ALLOWED_HOSTS =['*']
 
 # ========================
 # INSTALLED APPS
