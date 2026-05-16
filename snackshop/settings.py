@@ -1,10 +1,7 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from datetime import timedelta
 import dj_database_url
-
-# LOAD ENV
-load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,10 +96,11 @@ WSGI_APPLICATION = 'snackshop.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL")
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
     )
 }
-
 # ========================
 # PASSWORD VALIDATION
 # ========================
@@ -164,11 +162,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # ========================
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'cloud_name': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'api_key': os.getenv('CLOUDINARY_API_KEY'),
+    'api_secret': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -211,7 +207,7 @@ AUTHENTICATION_BACKENDS = [
 
 AXES_FAILURE_LIMIT = 5
 
-AXES_COOLOFF_TIME = 1
+AXES_COOLOFF_TIME = timedelta(minutes=15)
 
 AXES_RESET_ON_SUCCESS = True
 
@@ -220,3 +216,4 @@ AXES_RESET_ON_SUCCESS = True
 # ========================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+WHITENOISE_USE_FINDERS = True
