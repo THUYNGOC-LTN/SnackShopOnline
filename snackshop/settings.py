@@ -16,7 +16,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['*']
 
 # ========================
 # INSTALLED APPS
