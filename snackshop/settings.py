@@ -187,7 +187,7 @@ AXES_LOCKOUT_CALLABLE = None
 # ========================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "Lax"
