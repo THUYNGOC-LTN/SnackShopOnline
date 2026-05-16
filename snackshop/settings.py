@@ -16,7 +16,10 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost"
+).split(",")
 
 # ========================
 # INSTALLED APPS
@@ -86,14 +89,16 @@ WSGI_APPLICATION = 'snackshop.wsgi.application'
 # DATABASE
 # ========================
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=config("DATABASE_URL"),
+        default=DATABASE_URL,
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=not DEBUG
     )
 }
-
+DEBUG = os.getenv("DEBUG", "False") == "True"
 # ========================
 # PASSWORD VALIDATION
 # ========================
