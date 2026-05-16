@@ -1,10 +1,19 @@
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
 import os
-import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "snackshop.settings")
-django.setup()
+class Command(BaseCommand):
+    def handle(self, *args, **kwargs):
+        username = os.environ.get("DJANGO_SUPERUSER_NAME")
+        password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+        email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
 
-from django.core.management import call_command
-
-call_command("loaddata", "db.json")
-print("Done")
+        if not User.objects.filter(username=username).exists():
+            User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password
+            )
+            print("Superuser created")
+        else:
+            print("Superuser already exists")
