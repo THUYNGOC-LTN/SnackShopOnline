@@ -1,23 +1,16 @@
-import os
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "snackshop.settings")
-django.setup()
-
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-username = os.getenv("DJANGO_SUPERUSER_NAME", "admin")
-email = os.getenv("DJANGO_SUPERUSER_EMAIL", "admin@gmail.com")
-password = os.getenv("DJANGO_SUPERUSER_PASSWORD", "admin123")
+username = "adminngoc"
+password = "123456"
 
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(
         username=username,
-        email=email,
-        password=password
+        password=password,
+        email="admin@gmail.com"
     )
-    print("✅ Superuser created")
+    print("Superuser created")
 else:
-    print("ℹ️ Superuser already exists")
+    print("Superuser already exists")
