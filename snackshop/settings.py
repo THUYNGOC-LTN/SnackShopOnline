@@ -144,7 +144,7 @@ CLOUDINARY_STORAGE = {
     'api_secret': config('CLOUDINARY_API_SECRET'),
 }
 
-STORAGE ={
+STORAGES ={
     'default':{
         'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
     },
