@@ -144,12 +144,16 @@ WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['.map']
 # ========================
 
 CLOUDINARY_STORAGE = {
-    "cloud_name": config("CLOUDINARY_CLOUD_NAME"),
-    "api_key": config("CLOUDINARY_API_KEY"),
-    "api_secret": config("CLOUDINARY_API_SECRET"),
+    'cloud_name': config('CLOUDINARY_CLOUD_NAME'),
+    'api_key': config('CLOUDINARY_API_KEY'),
+    'api_secret': config('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
 # ========================
 # LOGIN / LOGOUT
 # ========================
