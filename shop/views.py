@@ -139,33 +139,38 @@ def user_logout(request):
 @login_required
 def add_to_cart(request, product_id):
 
-    # ADMIN không được mua hàng
     if request.user.is_staff:
-        return redirect('admin_dashboard')
+        return JsonResponse({
+            'success': False
+        })
 
-    # Lấy sản phẩm
     product = get_object_or_404(
         Product,
         id=product_id
     )
 
-    # Tạo giỏ hàng
     cart, created = Cart.objects.get_or_create(
         user=request.user
     )
 
-    # Kiểm tra sản phẩm đã có chưa
     item, created = CartItem.objects.get_or_create(
         cart=cart,
         product=product
     )
 
-    # Nếu đã có -> tăng số lượng
     if not created:
         item.quantity += 1
         item.save()
 
-    return redirect('home')
+    cart_count = CartItem.objects.filter(
+        cart=cart
+    ).count()
+
+    return JsonResponse({
+        'success': True,
+        'cart_count': cart_count,
+        'message': 'Đã thêm vào giỏ hàng'
+    })
 
 
 # =========================
@@ -210,13 +215,46 @@ def update_quantity(request, item_id):
 # =========================
 # REMOVE ITEM
 # =========================
+# =========================
+# REMOVE ITEM
+# =========================
 @login_required
 def remove_from_cart(request, item_id):
-    item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False
+        })
+
+    item = get_object_or_404(
+        CartItem,
+        id=item_id,
+        cart__user=request.user
+    )
+
     item.delete()
-    return redirect('cart')
 
+    cart = Cart.objects.get(user=request.user)
 
+    total = sum(
+        i.product.price * i.quantity
+        for i in cart.items.all()
+    )
+
+    cart_count = sum(
+        i.quantity
+        for i in cart.items.all()
+    )
+
+    return JsonResponse({
+        "success": True,
+        "cart_total": float(total),
+        "cart_count": cart_count
+    })
+
+# =========================
+# CHECKOUT
+# =========================
 # =========================
 # CHECKOUT
 # =========================
@@ -225,7 +263,10 @@ def checkout(request):
 
     # ADMIN không được checkout
     if request.user.is_staff:
-        return redirect('admin_dashboard')
+        return JsonResponse({
+            "success": False,
+            "message": "Admin không thể mua hàng"
+        })
 
     # =========================
     # LẤY GIỎ HÀNG
@@ -234,11 +275,29 @@ def checkout(request):
         user=request.user
     )
 
-    items = CartItem.objects.filter(cart=cart)
+    items = CartItem.objects.filter(
+        cart=cart
+    )
 
-    # Không có sản phẩm
+    # =========================
+    # GIỎ HÀNG TRỐNG
+    # =========================
     if not items.exists():
-        messages.error(request, "Giỏ hàng trống")
+
+        if request.headers.get(
+            "X-Requested-With"
+        ) == "XMLHttpRequest":
+
+            return JsonResponse({
+                "success": False,
+                "message": "Giỏ hàng trống"
+            })
+
+        messages.error(
+            request,
+            "Giỏ hàng trống"
+        )
+
         return redirect('home')
 
     # =========================
@@ -250,20 +309,36 @@ def checkout(request):
     )
 
     # =========================
-    # XỬ LÝ POST (ĐẶT HÀNG)
+    # POST
     # =========================
     if request.method == 'POST':
 
-        fullname = request.POST.get('fullname')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
+        fullname = request.POST.get(
+            'fullname'
+        )
 
-        payment_method = request.POST.get('payment_method', 'COD')
+        phone = request.POST.get(
+            'phone'
+        )
 
+        address = request.POST.get(
+            'address'
+        )
+
+        payment_method = request.POST.get(
+            'payment_method',
+            'COD'
+        )
+
+        # =========================
         # VALIDATE
+        # =========================
         if not fullname or not phone or not address:
-            messages.error(request, "Vui lòng nhập đầy đủ thông tin")
-            return redirect('checkout')
+
+            return JsonResponse({
+                "success": False,
+                "message": "Vui lòng nhập đầy đủ thông tin"
+            })
 
         # =========================
         # TẠO ORDER
@@ -276,9 +351,11 @@ def checkout(request):
             total_price=total,
             payment_method=payment_method,
             status='PENDING'
-        )   
+        )
 
-        # tạo payment luôn
+        # =========================
+        # PAYMENT
+        # =========================
         Payment.objects.create(
             order=order,
             amount=total,
@@ -286,9 +363,10 @@ def checkout(request):
         )
 
         # =========================
-        # TẠO ORDER ITEMS
+        # ORDER ITEMS
         # =========================
         for item in items:
+
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
@@ -297,39 +375,38 @@ def checkout(request):
             )
 
         # =========================
-        # TĂNG SOLD COUNT (FIXED)
+        # SOLD COUNT
         # =========================
         for item in items:
+
             product = item.product
+
             product.sold_count += item.quantity
+
             product.save()
 
         # =========================
-        # XÓA GIỎ HÀNG
+        # CLEAR CART
         # =========================
         items.delete()
 
         # =========================
-        # BANKING FLOW (QR PAYMENT)
+        # AJAX RESPONSE
         # =========================
         if payment_method == 'BANKING':
 
-            # chuyển sang trang QR theo order_code (chuẩn hơn id)
-            return redirect(
-                'payment_qr',
-                order_code=order.order_code
-            )
+            return JsonResponse({
+                "success": True,
+                "redirect_url": f"/payment-qr/{order.order_code}/"
+            })
 
-        # =========================
-        # COD FLOW
-        # =========================
-        return redirect(
-            'order_success',
-            order_code=order.order_code
-        )
+        return JsonResponse({
+            "success": True,
+            "redirect_url": f"/order-success/{order.order_code}/"
+        })
 
     # =========================
-    # RENDER CHECKOUT PAGE
+    # RENDER PAGE
     # =========================
     return render(
         request,
@@ -627,30 +704,122 @@ def product_detail(request, product_id):
 # =========================
 @login_required
 def add_review(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
 
+    product = get_object_or_404(
+        Product,
+        id=product_id
+    )
+
+    # =========================
+    # KIỂM TRA ĐÃ MUA
+    # =========================
     has_bought = OrderItem.objects.filter(
         order__user=request.user,
+        order__status='CONFIRMED',
         product=product
     ).exists()
 
     if not has_bought:
-        messages.error(request, "Bạn cần mua sản phẩm trước khi đánh giá")
-        return redirect('product_detail', product_id=product.id)
 
+        # AJAX
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+
+            return JsonResponse({
+                'success': False,
+                'message': 'Bạn cần mua sản phẩm trước khi đánh giá'
+            })
+
+        messages.error(
+            request,
+            "Bạn cần mua sản phẩm trước khi đánh giá"
+        )
+
+        return redirect(
+            'product_detail',
+            product_id=product.id
+        )
+
+    # =========================
+    # KHÔNG CHO REVIEW TRÙNG
+    # =========================
+    already_reviewed = Review.objects.filter(
+        user=request.user,
+        product=product
+    ).exists()
+
+    if already_reviewed:
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+
+            return JsonResponse({
+                'success': False,
+                'message': 'Bạn đã đánh giá sản phẩm này rồi'
+            })
+
+        messages.warning(
+            request,
+            "Bạn đã đánh giá sản phẩm này rồi"
+        )
+
+        return redirect(
+            'product_detail',
+            product_id=product.id
+        )
+
+    # =========================
+    # POST
+    # =========================
     if request.method == 'POST':
-        form = ReviewForm(request.POST, request.FILES)
+
+        form = ReviewForm(
+            request.POST,
+            request.FILES
+        )
+
         if form.is_valid():
+
             review = form.save(commit=False)
+
             review.user = request.user
             review.product = product
+
             review.save()
-            messages.success(request, "🎉 Đánh giá thành công!")
+
+            # AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+
+                return JsonResponse({
+                    'success': True,
+                    'message': '🎉 Đánh giá thành công!',
+                    'username': request.user.username,
+                    'rating': review.rating,
+                    'comment': review.comment,
+                })
+
+            messages.success(
+                request,
+                "🎉 Đánh giá thành công!"
+            )
+
         else:
-            messages.error(request, "Có lỗi khi tạo đánh giá")
 
-    return redirect('product_detail', product_id=product.id)
+            # AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
 
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Form không hợp lệ'
+                })
+
+            messages.error(
+                request,
+                "Có lỗi khi tạo đánh giá"
+            )
+
+    return redirect(
+        'product_detail',
+        product_id=product.id
+    )
 
 
 # =========================
@@ -850,6 +1019,9 @@ def edit_product(request, id):
 # =========================
 # INCREASE CART QUANTITY
 # =========================
+# =========================
+# INCREASE CART QUANTITY
+# =========================
 @login_required
 def increase_cart(request, item_id):
 
@@ -863,10 +1035,41 @@ def increase_cart(request, item_id):
 
     item.save()
 
-    return redirect('cart')
+    # tổng item
+    item_total = (
+        item.product.price *
+        item.quantity
+    )
+
+    # tổng cart
+    cart_total = sum(
+        i.product.price * i.quantity
+        for i in item.cart.cartitem_set.all()
+    )
+
+    # tổng số lượng cart
+    cart_count = sum(
+        i.quantity
+        for i in item.cart.cartitem_set.all()
+    )
+
+    return JsonResponse({
+
+        'success': True,
+
+        'quantity': item.quantity,
+
+        'item_total': float(item_total),
+
+        'cart_total': float(cart_total),
+
+        'cart_count': cart_count
+    })
+
 
 # =========================
 # DECREASE CART QUANTITY
+# =========================
 @login_required
 def decrease_cart(request, item_id):
 
@@ -876,18 +1079,55 @@ def decrease_cart(request, item_id):
         cart__user=request.user
     )
 
+    cart = item.cart
+
     if item.quantity > 1:
 
         item.quantity -= 1
 
         item.save()
 
+        item_total = (
+            item.product.price *
+            item.quantity
+        )
+
+        deleted = False
+
     else:
 
         item.delete()
 
-    return redirect('cart')
+        item_total = 0
 
+        deleted = True
+
+    # tổng cart
+    cart_total = sum(
+        i.product.price * i.quantity
+        for i in cart.cartitem_set.all()
+    )
+
+    # tổng số lượng
+    cart_count = sum(
+        i.quantity
+        for i in cart.cartitem_set.all()
+    )
+
+    return JsonResponse({
+
+        'success': True,
+
+        'deleted': deleted,
+
+        'quantity': item.quantity if not deleted else 0,
+
+        'item_total': float(item_total),
+
+        'cart_total': float(cart_total),
+
+        'cart_count': cart_count
+    })
 @login_required
 def add_shop_review(request):
 
@@ -924,24 +1164,21 @@ def payment_qr(request, order_code):
     if order.payment_method != "BANKING":
         return redirect('order_success', order_code=order.order_code)
 
-    bank_id = "TPBANK"       # MB Bank (ví dụ)
-    account = "38788393939"
+    # ❌ chặn order đã thanh toán
+    if order.status != "PENDING":
+        return redirect('order_success', order_code=order.order_code)
 
-    # QUAN TRỌNG: content phải match webhook
+    bank_bin = "970407"
+    account_no = "38788393939"
+
     content = order.order_code
-
-    # encode chống lỗi webhook
     encoded_content = urllib.parse.quote(content)
 
     qr_url = (
-        f"https://img.vietqr.io/image/{bank_id}-{account}-compact.png"
-        f"?amount={order.total_price}"
+        f"https://img.vietqr.io/image/{bank_bin}-{account_no}-compact.png"
+        f"?amount={int(order.total_price)}"
         f"&addInfo={encoded_content}"
     )
-
-    # set trạng thái chờ thanh toán
-    if order.status == "PENDING":
-        order.save()
 
     return render(request, "shop/payment_qr.html", {
         "order": order,
@@ -955,9 +1192,9 @@ def check_payment(request, order_code):
 
     order = get_object_or_404(Order, order_code=order_code)
 
+    # chỉ trả minimal data (không expose DB logic)
     return JsonResponse({
-        "status": order.status,
-        "order_code": order.order_code
+        "status": order.status
     })
 from django.shortcuts import get_object_or_404, redirect
 from .models import Order
@@ -965,6 +1202,9 @@ from .models import Order
 def confirm_payment(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
+
+    if order.status == "CONFIRMED":
+        return redirect('order_success', order_code=order.order_code)
 
     if order.payment_method == "BANKING":
         order.status = "CONFIRMED"
@@ -1002,34 +1242,40 @@ def payment_webhook(request):
     raw_body = request.body
     signature = request.headers.get("X-SePay-Signature")
 
-    # ❌ sai signature → reject
     if not verify_sepay_signature(raw_body, signature):
         return JsonResponse({"error": "invalid signature"}, status=403)
 
-    data = json.loads(raw_body)
-
-    """
-    SePay gửi:
-    {
-        "content": "OD123456",
-        "amount": 89000
-    }
-    """
+    try:
+        data = json.loads(raw_body)
+    except:
+        return JsonResponse({"error": "invalid json"}, status=400)
 
     order_code = data.get("content")
-    amount = data.get("amount")
+    amount = int(data.get("amount", 0))
+
+    if not order_code:
+        return JsonResponse({"error": "missing order_code"}, status=400)
 
     order = Order.objects.filter(order_code=order_code).first()
 
     if not order:
         return JsonResponse({"error": "order not found"}, status=404)
 
-    # check tiền chống fake
-    if order.total_price != amount:
+    # chống fake amount
+    if int(order.total_price) != amount:
         return JsonResponse({"error": "invalid amount"}, status=400)
 
-    # update trạng thái
-    order.status = "CONFIRMED"
-    order.save()
+    # idempotent
+    if order.status == "CONFIRMED":
+        return JsonResponse({"message": "already confirmed"})
+
+    if order.status == "CANCELLED":
+        return JsonResponse({"error": "order cancelled"}, status=400)
+
+    # 🔥 LOCK LOGIC (tránh double update)
+    Order.objects.filter(
+        order_code=order_code,
+        status="PENDING"
+    ).update(status="CONFIRMED")
 
     return JsonResponse({"message": "success"})

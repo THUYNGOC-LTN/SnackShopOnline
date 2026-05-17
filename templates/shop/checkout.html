@@ -58,7 +58,10 @@
                         🚚 Phí vận chuyển
                     </span>
 
-                    <span style="color: #27ae60; font-weight: 800;">
+                    <span style="
+                        color: #27ae60;
+                        font-weight: 800;
+                    ">
                         Miễn phí
                     </span>
 
@@ -86,7 +89,11 @@
 
             <div class="checkout_box">
 
-                <form method="POST">
+                <!-- FORM -->
+                <form
+                    method="POST"
+                    id="checkoutForm"
+                >
 
                     {% csrf_token %}
 
@@ -100,32 +107,38 @@
                         👤 Họ và tên
                     </label>
 
-                    <input type="text"
-                           name="fullname"
-                           placeholder="Nhập họ và tên đầy đủ"
-                           class="form_input"
-                           required>
+                    <input
+                        type="text"
+                        name="fullname"
+                        placeholder="Nhập họ và tên đầy đủ"
+                        class="form_input"
+                        required
+                    >
 
                     <!-- PHONE -->
                     <label class="form_input_label">
                         📞 Số điện thoại
                     </label>
 
-                    <input type="text"
-                           name="phone"
-                           placeholder="Nhập số điện thoại"
-                           class="form_input"
-                           required>
+                    <input
+                        type="text"
+                        name="phone"
+                        placeholder="Nhập số điện thoại"
+                        class="form_input"
+                        required
+                    >
 
                     <!-- ADDRESS -->
                     <label class="form_input_label">
                         📮 Địa chỉ giao hàng
                     </label>
 
-                    <textarea name="address"
-                              placeholder="Nhập địa chỉ giao hàng chi tiết"
-                              class="form_input"
-                              required></textarea>
+                    <textarea
+                        name="address"
+                        placeholder="Nhập địa chỉ giao hàng chi tiết"
+                        class="form_input"
+                        required
+                    ></textarea>
 
                     <!-- PAYMENT -->
                     <h5 class="mt-4">
@@ -137,15 +150,19 @@
 
                         <div class="form-check">
 
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="payment_method"
-                                   value="COD"
-                                   id="cod"
-                                   checked>
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="payment_method"
+                                value="COD"
+                                id="cod"
+                                checked
+                            >
 
-                            <label class="form-check-label"
-                                   for="cod">
+                            <label
+                                class="form-check-label"
+                                for="cod"
+                            >
 
                                 💵 Thanh toán khi nhận hàng (COD)
 
@@ -160,14 +177,18 @@
 
                         <div class="form-check">
 
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="payment_method"
-                                   value="BANKING"
-                                   id="bank">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="payment_method"
+                                value="BANKING"
+                                id="bank"
+                            >
 
-                            <label class="form-check-label"
-                                   for="bank">
+                            <label
+                                class="form-check-label"
+                                for="bank"
+                            >
 
                                 🏦 Chuyển khoản ngân hàng
 
@@ -177,23 +198,41 @@
 
                     </div>
 
-                    <!-- INFO BOX -->
+                    <!-- INFO -->
                     <div class="alert alert-info mt-4">
 
-                        <strong>ℹ️ Lưu ý:</strong>
+                        <strong>
+                            ℹ️ Lưu ý:
+                        </strong>
 
                         <br>
 
                         Nếu chọn chuyển khoản ngân hàng,
-                        hệ thống sẽ tự động chuyển sang
-                        trang quét mã QR thanh toán
-                        sau khi xác nhận đơn hàng.
+                        hệ thống sẽ chuyển sang
+                        trang quét mã QR tự động.
 
                     </div>
 
+                    <!-- LOADING -->
+                    <div
+                        id="loadingBox"
+                        style="
+                            display:none;
+                            margin-top:15px;
+                            text-align:center;
+                            font-weight:600;
+                            color:#ffbe33;
+                        "
+                    >
+                        ⏳ Đang xử lý đơn hàng...
+                    </div>
+
                     <!-- BUTTON -->
-                    <button type="submit"
-                            class="confirm_btn">
+                    <button
+                        type="submit"
+                        class="confirm_btn"
+                        id="checkoutBtn"
+                    >
 
                         ✅ Xác nhận đặt hàng
 
@@ -210,8 +249,10 @@
     <!-- BACK -->
     <div class="text-center mt-5">
 
-        <a href="{% url 'cart' %}"
-           class="back_btn">
+        <a
+            href="{% url 'cart' %}"
+            class="back_btn"
+        >
 
             ← Quay lại giỏ hàng
 
@@ -222,5 +263,86 @@
 </div>
 
 </section>
+
+<script>
+
+const checkoutForm =
+    document.getElementById(
+        "checkoutForm"
+    );
+
+checkoutForm.addEventListener(
+    "submit",
+    async function(e){
+
+        e.preventDefault();
+
+        // UI loading
+        document.getElementById(
+            "checkoutBtn"
+        ).disabled = true;
+
+        document.getElementById(
+            "loadingBox"
+        ).style.display = "block";
+
+        const formData =
+            new FormData(this);
+
+        try{
+
+            const response = await fetch(
+                "{% url 'checkout' %}",
+                {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    }
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if(data.success){
+
+                // redirect mượt
+                window.location.href =
+                    data.redirect_url;
+
+            }else{
+
+                alert(data.message);
+
+                document.getElementById(
+                    "checkoutBtn"
+                ).disabled = false;
+
+                document.getElementById(
+                    "loadingBox"
+                ).style.display = "none";
+            }
+
+        }catch(error){
+
+            alert(
+                "⚠️ Có lỗi xảy ra"
+            );
+
+            document.getElementById(
+                "checkoutBtn"
+            ).disabled = false;
+
+            document.getElementById(
+                "loadingBox"
+            ).style.display = "none";
+        }
+
+    }
+);
+
+</script>
 
 {% endblock %}

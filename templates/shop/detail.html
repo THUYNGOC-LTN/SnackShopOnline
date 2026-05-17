@@ -1,45 +1,59 @@
 {% extends 'base.html' %} 
 {% load static %}
 {% load custom_filters %} 
+
 {% block content %}
 
 <section class="product_page">
   <div class="container">
+
     <div class="row g-5 product_box">
+
       <!-- IMAGE -->
       <div class="col-md-5 text-center">
         {% if product.image %}
-        <img src="{{ product.image.url }}" class="product_img" />
+          <img src="{{ product.image.url }}" class="product_img" />
         {% endif %}
       </div>
 
       <!-- INFO -->
       <div class="col-md-7">
+
         <h1 class="product_title">{{ product.name }}</h1>
 
-        <h2 class="product_price mb-3">{{ product.price|vnd }} </h2>
+        <h2 class="product_price mb-3">
+          {{ product.price|vnd }}
+        </h2>
 
         <p class="text-muted">{{ product.description }}</p>
-      
-      <div class="sold_text">
-        Đã bán {{ product.sold_count }} 
-      </div>
+
+        <div class="sold_text">
+          Đã bán {{ product.sold_count }}
+        </div>
+
         <!-- RATING -->
         <div class="mb-3">
-          {% if avg_rating %} ⭐ <b>{{ avg_rating|floatformat:1 }}/5</b>
+          {% if avg_rating %}
+            ⭐ <b>{{ avg_rating|floatformat:1 }}/5</b>
           {% else %}
-          <span class="text-muted">Chưa có đánh giá</span>
+            <span class="text-muted">Chưa có đánh giá</span>
           {% endif %}
         </div>
 
-        <!-- BUTTON -->
+        <!-- ADD TO CART -->
         {% if user.is_authenticated %}
-        <a href="{% url 'add_to_cart' product.id %}" class="btn_shop">
-          🛒 Thêm vào giỏ
-        </a>
+          <button
+            class="btn_shop add-to-cart-btn"
+            data-url="{% url 'add_to_cart' product.id %}"
+          >
+            🛒 Thêm vào giỏ
+          </button>
         {% else %}
-        <a href="{% url 'login' %}" class="btn_shop"> 🔐 Đăng nhập để mua </a>
+          <a href="{% url 'login' %}" class="btn_shop">
+            🔐 Đăng nhập để mua
+          </a>
         {% endif %}
+
       </div>
     </div>
 
@@ -51,6 +65,7 @@
     {% if can_review %}
 
     <form
+      id="reviewForm"
       method="POST"
       action="{% url 'add_review' product.id %}"
       class="review_card mb-4"
@@ -63,10 +78,10 @@
         <label class="fw-bold mb-2">Chọn số sao:</label><br />
 
         {% for i in "54321" %}
-        <label class="me-3">
-          <input type="radio" name="rating" value="{{ i }}" required />
-          {{ i }} ⭐
-        </label>
+          <label class="me-3">
+            <input type="radio" name="rating" value="{{ i }}" required />
+            {{ i }} ⭐
+          </label>
         {% endfor %}
       </div>
 
@@ -78,24 +93,26 @@
         required
       ></textarea>
 
-      <!-- IMAGE UPLOAD -->
+      <!-- IMAGE -->
       <div class="mb-3">
-        <label class="fw-bold mb-2">📸 Thêm ảnh (Tùy chọn):</label>
+        <label class="fw-bold mb-2">📸 Thêm ảnh</label>
         <input type="file" name="image" class="form-control" accept="image/*" />
-        <small class="text-muted d-block mt-1"
-          >Tải lên ảnh chứng minh chất lượng sản phẩm</small
-        >
       </div>
 
-      <button class="btn_shop">Gửi đánh giá</button>
+      <button type="submit" class="btn_shop">
+        Gửi đánh giá
+      </button>
+
     </form>
 
     {% elif user.is_authenticated %}
-    <div class="alert alert-warning">
-      ⚠️ Bạn cần mua sản phẩm trước khi đánh giá
-    </div>
+      <div class="alert alert-warning">
+        ⚠️ Bạn cần mua sản phẩm trước khi đánh giá
+      </div>
     {% else %}
-    <div class="alert alert-info">🔐 Đăng nhập để đánh giá</div>
+      <div class="alert alert-info">
+        🔐 Đăng nhập để đánh giá
+      </div>
     {% endif %}
 
     <!-- REVIEW LIST -->
@@ -104,52 +121,209 @@
     {% for r in reviews %}
 
     <div class="review_card mb-3">
-      <div class="d-flex justify-content-between">
-        <h6 class="fw-bold">👤 {{ r.user.last_name }}</h6>
 
-        <!-- STAR FIX -->
+      <div class="d-flex justify-content-between">
+
+        <h6 class="fw-bold">
+          👤 {{ r.user.username }}
+        </h6>
+
         <div>
-          {% for i in "12345" %} {% if forloop.counter <= r.rating %}
-          <span class="text-warning star">★</span>
-          {% else %}
-          <span class="text-secondary star">☆</span>
-          {% endif %} {% endfor %}
+          {% for i in "12345" %}
+            {% if forloop.counter <= r.rating %}
+              <span class="text-warning">★</span>
+            {% else %}
+              <span class="text-secondary">☆</span>
+            {% endif %}
+          {% endfor %}
         </div>
+
       </div>
 
       <p class="mb-0 text-muted">{{ r.comment }}</p>
 
-      <!-- REVIEW IMAGE -->
       {% if r.image %}
-      <div class="review_image mt-2 mb-2">
-        <img
-          src="{{ r.image.url }}"
-          alt="Review image"
-          style="
-            max-width: 300px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          "
-        />
+      <div class="mt-2">
+        <img src="{{ r.image.url }}"
+             style="max-width:250px;border-radius:10px;">
       </div>
       {% endif %}
 
-      <small class="text-muted d-block mt-2">
+      <small class="text-muted">
         📅 {{ r.created_at|date:"d/m/Y H:i" }}
       </small>
+
     </div>
 
     {% empty %}
-    <p class="text-muted">Chưa có đánh giá nào</p>
+      <p class="text-muted">Chưa có đánh giá nào</p>
     {% endfor %}
 
-    <!-- BACK -->
     <div class="text-center mt-4">
       <a href="{% url 'home' %}" class="btn btn-outline-secondary">
         ⬅ Quay lại
       </a>
     </div>
+
   </div>
 </section>
+
+<!-- =========================
+     TOAST + AJAX SCRIPT
+========================= -->
+
+<style>
+.custom-toast{
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: #222;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(-15px);
+  transition: .3s;
+}
+
+.custom-toast.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.custom-toast.error{
+  background: #e74c3c;
+}
+</style>
+
+<script>
+
+// =====================
+// TOAST
+// =====================
+function showToast(msg, type="success"){
+
+    const toast = document.createElement("div");
+
+    toast.className = `custom-toast ${type}`;
+
+    toast.innerText = msg;
+
+    document.body.appendChild(toast);
+
+    setTimeout(()=> toast.classList.add("show"), 100);
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+        setTimeout(()=> toast.remove(), 300);
+    }, 2500);
+}
+
+
+// =====================
+// ADD TO CART AJAX
+// =====================
+const addBtn =
+    document.querySelector(".add-to-cart-btn");
+
+if(addBtn){
+
+    addBtn.addEventListener("click", async function(){
+
+        const url = this.dataset.url;
+
+        const old = this.innerHTML;
+
+        this.disabled = true;
+        this.innerHTML = "⏳ Đang thêm...";
+
+        try{
+
+            const res = await fetch(url, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            const data = await res.json();
+
+            if(data.success){
+
+                showToast("🛒 Đã thêm vào giỏ");
+
+                const badge =
+                    document.getElementById("cart-count");
+
+                if(badge){
+                    badge.innerText = data.cart_count;
+                }
+
+            }else{
+                showToast(data.message, "error");
+            }
+
+        }catch{
+            showToast("Lỗi server", "error");
+        }
+
+        this.disabled = false;
+        this.innerHTML = old;
+
+    });
+
+}
+
+
+// =====================
+// REVIEW AJAX
+// =====================
+const reviewForm =
+    document.getElementById("reviewForm");
+
+if(reviewForm){
+
+    reviewForm.addEventListener("submit", async function(e){
+
+        e.preventDefault();
+
+        const btn = reviewForm.querySelector("button");
+
+        const old = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Đang gửi...";
+
+        try{
+
+            const res = await fetch(reviewForm.action, {
+                method: "POST",
+                body: new FormData(reviewForm),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            const data = await res.json();
+
+            if(data.success){
+                showToast(data.message);
+                setTimeout(()=> location.reload(), 800);
+            }else{
+                showToast(data.message, "error");
+            }
+
+        }catch{
+            showToast("Lỗi gửi đánh giá", "error");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = old;
+
+    });
+
+}
+
+</script>
 
 {% endblock %}

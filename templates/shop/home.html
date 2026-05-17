@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %}
 
 <!-- HERO -->
 {% block hero %}
@@ -25,7 +23,6 @@
           />
           <button type="submit" class="btn btn-warning ms-2">🔍</button>
         </form>
-
       </div>
     </div>
   </section>
@@ -37,9 +34,7 @@
 
 <section class="about_snackshop">
   <div class="container">
-
     <div class="row align-items-center">
-
       <div class="col-lg-5 text-center">
         <img src="{% static 'images/logo1.gif' %}" class="snackshop_logo" />
       </div>
@@ -49,22 +44,16 @@
           <h2>SNACKSHOP</h2>
           <div class="about_line"></div>
 
-          <p>
-            SnackShop là cửa hàng chuyên cung cấp đồ ăn vặt...
-          </p>
-
+          <p>SnackShop là cửa hàng chuyên cung cấp đồ ăn vặt...</p>
         </div>
       </div>
-
     </div>
-
   </div>
 </section>
 
 <!-- BEST SELLER -->
 <section class="food_section">
   <div class="container">
-
     <h2>🏆 Sản phẩm bán chạy</h2>
 
     <div class="row">
@@ -72,12 +61,11 @@
 
       <div class="col-sm-6 col-lg-3 mb-5">
         <div class="box">
-
           <div class="img-box">
             {% if p.image %}
-              <img src="{{ p.image.url }}" alt="{{ p.name }}">
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
             {% else %}
-              <div>Không có ảnh</div>
+            <div>Không có ảnh</div>
             {% endif %}
           </div>
 
@@ -86,29 +74,28 @@
             <h6>{{ p.price|vnd }} VND</h6>
 
             {% if user.is_authenticated %}
-              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
-                🛒 Thêm vào giỏ
-              </a>
+            <button
+              class="add-to-cart-btn"
+              data-url="{% url 'add_to_cart' p.id %}"
+            >
+              🛒 Thêm vào giỏ
+            </button>
             {% else %}
-              <a href="{% url 'login' %}" class="btn btn-light w-100">
-                🔐 Đăng nhập
-              </a>
+            <a href="{% url 'login' %}" class="btn btn-light w-100">
+              🔐 Đăng nhập
+            </a>
             {% endif %}
-
           </div>
-
         </div>
       </div>
 
       {% endfor %}
     </div>
-
   </div>
 </section>
 
 <!-- NEW PRODUCTS -->
-<section class="food_section" style="background:#f9f9f9">
-
+<section class="food_section" style="background: #f9f9f9">
   <div class="container">
     <h2>🔥 Sản phẩm mới</h2>
 
@@ -116,14 +103,12 @@
       {% for p in new_products %}
 
       <div class="col-sm-6 col-lg-3 mb-5">
-
         <div class="box">
-
           <div class="img-box">
             {% if p.image %}
-              <img src="{{ p.image.url }}" alt="{{ p.name }}">
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
             {% else %}
-              <div>Không có ảnh</div>
+            <div>Không có ảnh</div>
             {% endif %}
           </div>
 
@@ -132,36 +117,32 @@
             <h6>{{ p.price|vnd }} VND</h6>
 
             {% if user.is_authenticated %}
-              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
-                🛒 Thêm vào giỏ
-              </a>
+            <button
+              class="add-to-cart-btn"
+              data-url="{% url 'add_to_cart' p.id %}"
+            >
+              🛒 Thêm vào giỏ
+            </button>
             {% else %}
-              <a href="{% url 'login' %}" class="btn btn-light w-100">
-                🔐 Đăng nhập
-              </a>
+            <a href="{% url 'login' %}" class="btn btn-light w-100">
+              🔐 Đăng nhập
+            </a>
             {% endif %}
-
           </div>
-
         </div>
-
       </div>
 
       {% endfor %}
     </div>
-
   </div>
 </section>
 
 <!-- CATEGORY -->
 <section class="food_section">
-
   <div class="container">
-
     <h2>✨ Danh mục sản phẩm</h2>
 
     <div class="category_menu">
-
       {% for c in categories|slice:":8" %}
 
       <a
@@ -172,21 +153,18 @@
       </a>
 
       {% endfor %}
-
     </div>
 
     <div class="row">
-
       {% for p in products|slice:":8" %}
 
       <div class="col-sm-6 col-lg-3 mb-5">
         <div class="box">
-
           <div class="img-box">
             {% if p.image %}
-              <img src="{{ p.image.url }}" alt="{{ p.name }}">
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
             {% else %}
-              <div>Không có ảnh</div>
+            <div>Không có ảnh</div>
             {% endif %}
           </div>
 
@@ -195,17 +173,18 @@
             <h6>{{ p.price|vnd }} VND</h6>
 
             {% if user.is_authenticated %}
-              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
-                🛒 Thêm vào giỏ
-              </a>
+            <button
+              class="add-to-cart-btn"
+              data-url="{% url 'add_to_cart' p.id %}"
+            >
+              🛒 Thêm vào giỏ
+            </button>
             {% else %}
-              <a href="{% url 'login' %}" class="btn btn-light w-100">
-                🔐 Đăng nhập
-              </a>
+            <a href="{% url 'login' %}" class="btn btn-light w-100">
+              🔐 Đăng nhập
+            </a>
             {% endif %}
-
           </div>
-
         </div>
       </div>
 
@@ -214,33 +193,24 @@
         <h3>Không có sản phẩm</h3>
       </div>
       {% endfor %}
-
     </div>
-
   </div>
 </section>
 
 <!-- REVIEWS -->
 <section class="shop_review_section">
-
   <div class="container">
-
     <div class="review_wrapper">
-
       <!-- LEFT -->
       <div class="review_showcase">
-
         <h2>💬 Khách hàng nói gì?</h2>
 
         <div class="review_stack">
           <div class="review_stack_inner">
-
             {% for r in shop_reviews %}
 
             <div class="review_card">
-
               <div class="review_top">
-
                 <div class="review_avatar">
                   {{ r.user.username|default:"U"|slice:":1" }}
                 </div>
@@ -249,31 +219,22 @@
                   <h5>{{ r.user.username|default:"User" }}</h5>
 
                   <div class="review_stars">
-                    {% for i in "12345" %}
-                      {% if forloop.counter <= r.rating %}
-                        ⭐
-                      {% endif %}
-                    {% endfor %}
+                    {% for i in "12345" %} {% if forloop.counter <= r.rating %}
+                    ⭐ {% endif %} {% endfor %}
                   </div>
-
                 </div>
-
               </div>
 
               <p>"{{ r.message }}"</p>
-
             </div>
 
             {% endfor %}
-
           </div>
         </div>
-
       </div>
 
       <!-- RIGHT -->
       <div class="review_form_box">
-
         <h2>✨ Đánh giá</h2>
 
         {% if user.is_authenticated %}
@@ -292,41 +253,124 @@
           <textarea name="message" required></textarea>
 
           <button type="submit">Gửi</button>
-
         </form>
 
         {% else %}
-          <p>Đăng nhập để đánh giá</p>
+        <p>Đăng nhập để đánh giá</p>
         {% endif %}
-
       </div>
-
     </div>
-
   </div>
-
 </section>
 
 <script>
-const form = document.getElementById("shopReviewForm");
+  //
+  // SHOP REVIEW AJAX
+  //
+  const form = document.getElementById("shopReviewForm");
 
-if(form){
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const res = await fetch("{% url 'add_shop_review' %}", {
-      method: "POST",
-      body: new FormData(form),
-      headers: { "X-Requested-With": "XMLHttpRequest" }
+      const submitBtn = form.querySelector("button");
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Đang gửi...";
+
+      try {
+        const res = await fetch("{% url 'add_shop_review' %}", {
+          method: "POST",
+          body: new FormData(form),
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("🎉 Đánh giá thành công!");
+
+          form.reset();
+
+          location.reload();
+        } else {
+          alert("❌ Không thể gửi đánh giá");
+        }
+      } catch (error) {
+        console.log(error);
+
+        alert("⚠️ Có lỗi xảy ra");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Gửi";
+      }
     });
+  }
 
-    const data = await res.json();
+  //
+  // ADD TO CART AJAX
+  //
+  document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+    button.addEventListener("click", async function () {
+      const url = this.dataset.url;
 
-    if(data.success){
-      location.reload();
-    }
+      const btn = this;
+
+      btn.disabled = true;
+
+      btn.innerHTML = "⏳ Đang thêm...";
+
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          //
+          // UPDATE CART COUNT
+          //
+          const cartBadge = document.getElementById("cart-count");
+
+          if (cartBadge) {
+            cartBadge.innerText = data.cart_count;
+          }
+
+          //
+          // SUCCESS EFFECT
+          //
+          btn.innerHTML = "✅ Đã thêm";
+
+          setTimeout(() => {
+            btn.innerHTML = "🛒 Thêm vào giỏ";
+
+            btn.disabled = false;
+          }, 1200);
+        } else {
+          alert("❌ Thêm giỏ hàng thất bại");
+
+          btn.disabled = false;
+
+          btn.innerHTML = "🛒 Thêm vào giỏ";
+        }
+      } catch (error) {
+        console.log(error);
+
+        alert("⚠️ Không thể kết nối server");
+
+        btn.disabled = false;
+
+        btn.innerHTML = "🛒 Thêm vào giỏ";
+      }
+    });
   });
-}
 </script>
 
 {% endblock %}
