@@ -433,7 +433,20 @@ def delete_blog(request, blog_id):
 # =========================
 def order_success(request, order_code):
 
-    order = Order.objects.get(order_code=order_code)
+    order = get_object_or_404(
+        Order,
+        order_code=order_code
+    )
+
+    # BANKING chưa thanh toán
+    if (
+        order.payment_method == "BANKING"
+        and order.status != "CONFIRMED"
+    ):
+        return redirect(
+            'payment_qr',
+            order_code=order.order_code
+        )
 
     return render(request, "orders/success.html", {
         "order": order
