@@ -1,5 +1,5 @@
 import json
-
+import urllib.parse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -13,6 +13,24 @@ from django.http import JsonResponse
 
 from .models import Category, Product, Cart, CartItem, Order, OrderItem, Review, UserProfile, Blog
 from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewForm, BlogForm
+
+# =========================
+# GET CART COUNT
+# =========================
+def get_cart_count(user):
+
+    if not user.is_authenticated:
+        return 0
+
+    cart = Cart.objects.filter(user=user).first()
+
+    if not cart:
+        return 0
+
+    return sum(
+        item.quantity
+        for item in CartItem.objects.filter(cart=cart)
+    )
 
 
 # =========================
@@ -620,30 +638,6 @@ def add_review(request, product_id):
 
     return redirect('product_detail', product_id=product.id)
 
-
-# =========================
-# PAYMENT QR
-# =========================
-@login_required
-def payment_qr(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-
-    return render(request, 'orders/payment_qr.html', {
-        'order': order
-    })
-
-
-# =========================
-# CONFIRM PAYMENT
-# =========================
-@login_required
-def confirm_payment(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-
-    order.status = 'CONFIRMED'
-    order.save()
-
-    return redirect('orders')
 
 
 # =========================
