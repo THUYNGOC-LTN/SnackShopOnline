@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+
 {% block content %}
+
 <section class="checkout_section">
 
 <div class="container">
@@ -33,8 +35,12 @@
                         </div>
 
                         <div class="product_qty">
-                            Số lượng: {{ item.quantity }} x {{ item.product.price|vnd }}
+                            Số lượng:
+                            {{ item.quantity }}
+                            x
+                            {{ item.product.price|vnd }}
                         </div>
+
                     </div>
 
                     <div class="product_price">
@@ -47,8 +53,15 @@
 
                 <!-- SHIPPING -->
                 <div class="summary_row">
-                    <span>🚚 Phí vận chuyển</span>
-                    <span style="color: #27ae60; font-weight: 800;">Miễn phí</span>
+
+                    <span>
+                        🚚 Phí vận chuyển
+                    </span>
+
+                    <span style="color: #27ae60; font-weight: 800;">
+                        Miễn phí
+                    </span>
+
                 </div>
 
                 <!-- TOTAL -->
@@ -77,30 +90,44 @@
 
                     {% csrf_token %}
 
+                    <!-- INFO -->
                     <h5>
                         📍 Thông tin nhận hàng
                     </h5>
 
-                    <label class="form_input_label">👤 Họ và tên</label>
+                    <!-- FULLNAME -->
+                    <label class="form_input_label">
+                        👤 Họ và tên
+                    </label>
+
                     <input type="text"
                            name="fullname"
                            placeholder="Nhập họ và tên đầy đủ"
                            class="form_input"
                            required>
 
-                    <label class="form_input_label">📞 Số điện thoại</label>
+                    <!-- PHONE -->
+                    <label class="form_input_label">
+                        📞 Số điện thoại
+                    </label>
+
                     <input type="text"
                            name="phone"
                            placeholder="Nhập số điện thoại"
                            class="form_input"
                            required>
 
-                    <label class="form_input_label">📮 Địa chỉ giao hàng</label>
+                    <!-- ADDRESS -->
+                    <label class="form_input_label">
+                        📮 Địa chỉ giao hàng
+                    </label>
+
                     <textarea name="address"
                               placeholder="Nhập địa chỉ giao hàng chi tiết"
                               class="form_input"
                               required></textarea>
 
+                    <!-- PAYMENT -->
                     <h5 class="mt-4">
                         💳 Phương thức thanh toán
                     </h5>
@@ -115,18 +142,20 @@
                                    name="payment_method"
                                    value="COD"
                                    id="cod"
-                                   checked
-                                   onchange="document.getElementById('bank-info').style.display='none'">
+                                   checked>
 
-                            <label class="form-check-label" for="cod">
+                            <label class="form-check-label"
+                                   for="cod">
+
                                 💵 Thanh toán khi nhận hàng (COD)
+
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- BANK -->
+                    <!-- BANKING -->
                     <div class="payment_box">
 
                         <div class="form-check">
@@ -135,36 +164,39 @@
                                    type="radio"
                                    name="payment_method"
                                    value="BANKING"
-                                   id="bank"
-                                   onchange="document.getElementById('bank-info').style.display='block'">
+                                   id="bank">
 
-                            <label class="form-check-label" for="bank">
+                            <label class="form-check-label"
+                                   for="bank">
+
                                 🏦 Chuyển khoản ngân hàng
+
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- QR -->
-                    <div id="bank-info"
-                         class="qr_box"
-                         style="display: none;">
+                    <!-- INFO BOX -->
+                    <div class="alert alert-info mt-4">
 
-                        <p>📱 Quét mã QR để thanh toán</p>
+                        <strong>ℹ️ Lưu ý:</strong>
 
-                        <img src="https://img.vietqr.io/image/MB-123456789-compact.png?amount={{ total }}&addInfo=DonHang{{ user.id }}&accountName=NGOC"
-                             alt="QR Code">
+                        <br>
 
-                        <div class="qr_note">
-                            ⚠️ Nội dung CK: DonHang{{ user.id }}
-                        </div>
+                        Nếu chọn chuyển khoản ngân hàng,
+                        hệ thống sẽ tự động chuyển sang
+                        trang quét mã QR thanh toán
+                        sau khi xác nhận đơn hàng.
 
                     </div>
 
                     <!-- BUTTON -->
-                    <button type="submit" class="confirm_btn">
+                    <button type="submit"
+                            class="confirm_btn">
+
                         ✅ Xác nhận đặt hàng
+
                     </button>
 
                 </form>
@@ -190,223 +222,5 @@
 </div>
 
 </section>
-
-<section class="checkout_section">
-
-<div class="container">
-
-    <!-- TITLE -->
-    <h2 class="checkout_title">
-      Xác nhận đơn hàng
-    </h2>
-
-    <div class="row g-4">
-
-        <!-- LEFT -->
-        <div class="col-lg-7">
-
-            <div class="checkout_box">
-
-                <h5>
-                    🍟 Sản phẩm đã chọn
-                </h5>
-
-                {% for item in items %}
-
-                <div class="product_item">
-
-                    <div>
-
-                        <div class="product_name">
-                            {{ item.product.name }}
-                        </div>
-
-                        <div class="product_qty">
-                            Số lượng: x{{ item.quantity }}
-                        </div>
-
-                    </div>
-
-                    <div class="product_price">
-                        {{ item.product.price|vnd }}
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-                <!-- SHIPPING -->
-                <div class="summary_row">
-                    <span>🚚 Phí vận chuyển</span>
-                    <span>Miễn phí</span>
-                </div>
-
-                <!-- TOTAL -->
-                <div class="total_box">
-
-                    <h4>
-                        Tổng cộng
-                    </h4>
-
-                    <div class="total_price">
-                        {{ total|vnd }}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- RIGHT -->
-        <div class="col-lg-5">
-
-            <div class="checkout_box">
-
-                <form method="POST">
-
-                    {% csrf_token %}
-
-                    <h5>
-                        📍 Thông tin nhận hàng
-                    </h5>
-
-                    <input type="text"
-                           name="fullname"
-                           placeholder="Họ và tên"
-                           class="form_input"
-                           required>
-
-                    <input type="text"
-                           name="phone"
-                           placeholder="Số điện thoại"
-                           class="form_input"
-                           required>
-
-                    <textarea name="address"
-                              placeholder="Nhập địa chỉ giao hàng"
-                              class="form_input"
-                              required></textarea>
-
-                    <h5 class="mt-4">
-                        💳 Phương thức thanh toán
-                    </h5>
-
-                    <!-- COD -->
-                    <div class="payment_box">
-
-                        <div class="form-check">
-
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="payment_method"
-                                   value="COD"
-                                   id="cod"
-                                   checked>
-
-                            <label class="form-check-label" for="cod">
-                                💵 Thanh toán khi nhận hàng
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <!-- BANK -->
-                    <div class="payment_box">
-
-                        <div class="form-check">
-
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="payment_method"
-                                   value="BANKING"
-                                   id="bank">
-
-                            <label class="form-check-label" for="bank">
-                                🏦 Chuyển khoản ngân hàng
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <!-- QR -->
-                    <div id="bank-info"
-                         class="qr_box"
-                         style="display:none;">
-
-                        <p class="fw-bold mb-3">
-                            📱 Quét mã QR để thanh toán
-                        </p>
-
-                        <img src="https://img.vietqr.io/image/MB-123456789-compact.png?amount={{ total }}&addInfo=DonHang{{ user.id }}&accountName=NGOC">
-
-                        <div class="qr_note">
-                            Nội dung CK: DonHang{{ user.id }}
-                        </div>
-
-                    </div>
-
-                    <!-- BUTTON -->
-                    <button class="confirm_btn">
-                        ✅ Xác nhận đặt hàng
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- BACK -->
-    <div class="text-center mt-4">
-
-        <a href="{% url 'cart' %}"
-           class="back_btn">
-
-            ⬅ Quay lại giỏ hàng
-
-        </a>
-
-    </div>
-
-</div>
-
-</section>
-
-<!-- SCRIPT -->
-<script>
-
-document.addEventListener("DOMContentLoaded", function(){
-
-    const radios = document.querySelectorAll(
-        'input[name="payment_method"]'
-    );
-
-    const bankInfo = document.getElementById(
-        'bank-info'
-    );
-
-    radios.forEach(radio => {
-
-        radio.addEventListener('change', function(){
-
-            if(this.value === 'BANKING'){
-                bankInfo.style.display = 'block';
-            }
-            else{
-                bankInfo.style.display = 'none';
-            }
-
-        });
-
-    });
-
-});
-
-</script>
 
 {% endblock %}

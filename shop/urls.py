@@ -22,7 +22,11 @@ urlpatterns = [
     path('cancel-order/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('delete-product/<int:id>/', views.delete_product, name='delete_product'),
     path('delete-order/<int:id>/', views.delete_order, name='delete_order'),
-    path('payment-qr/<int:order_id>/', views.payment_qr, name='payment_qr'),
+    path(
+    'payment-qr/<str:order_code>/',
+    views.payment_qr,
+    name='payment_qr'
+    ),
     path('edit-product/<int:id>/', views.edit_product, name='edit_product'),
     path('order-success/<str:order_code>/',views.order_success, name='order_success'), 
     path('update-order-status/<int:order_id>/',views.update_order_status, name='update_order_status'), 
