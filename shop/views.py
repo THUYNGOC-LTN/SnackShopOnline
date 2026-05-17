@@ -911,8 +911,8 @@ def payment_qr(request, order_code):
     if order.payment_method != "BANKING":
         return redirect('order_success', order_code=order.order_code)
 
-    bank_id = "970436"       # MB Bank (ví dụ)
-    account = "0123456789"
+    bank_id = "TPBANK"       # MB Bank (ví dụ)
+    account = "38788393939"
 
     # QUAN TRỌNG: content phải match webhook
     content = order.order_code
