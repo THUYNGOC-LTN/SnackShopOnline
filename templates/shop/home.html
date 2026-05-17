@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% load custom_filters %}
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
 
 <!-- HERO -->
 {% block hero %}
@@ -10,11 +12,9 @@
   <section class="slider_section">
     <div class="container text-center">
       <div class="detail-box">
-        <h1>SnackShop </h1>
-
+        <h1>SnackShop</h1>
         <h2>Thiên đường đồ ăn vặt dành cho bạn</h2>
 
-        <!-- SEARCH -->
         <form method="GET" class="d-flex justify-content-center">
           <input
             type="text"
@@ -25,6 +25,7 @@
           />
           <button type="submit" class="btn btn-warning ms-2">🔍</button>
         </form>
+
       </div>
     </div>
   </section>
@@ -33,83 +34,26 @@
 
 <!-- CONTENT -->
 {% block content %}
+
 <section class="about_snackshop">
   <div class="container">
 
     <div class="row align-items-center">
 
-      <!-- LEFT -->
       <div class="col-lg-5 text-center">
-
-        <img
-          src="{% static 'images/logo1.gif' %}"
-          alt="SnackShop"
-          class="snackshop_logo"
-        >
-
+        <img src="{% static 'images/logo1.gif' %}" class="snackshop_logo" />
       </div>
 
-      <!-- RIGHT -->
       <div class="col-lg-7">
-
         <div class="about_content">
-
-          <h2 class="about_title">
-            SNACKSHOP
-          </h2>
-
+          <h2>SNACKSHOP</h2>
           <div class="about_line"></div>
 
-          <p class="about_desc">
-            SnackShop là cửa hàng chuyên cung cấp các loại đồ ăn vặt,
-            bánh tráng, snack, nước uống và các món hot trend được giới trẻ yêu thích.
-
-            Với tiêu chí ngon - sạch - giá hợp lý,
-            SnackShop luôn mang đến trải nghiệm mua sắm tiện lợi
-            cùng hàng trăm sản phẩm hấp dẫn dành cho học sinh, sinh viên và dân văn phòng.
+          <p>
+            SnackShop là cửa hàng chuyên cung cấp đồ ăn vặt...
           </p>
 
-          <!-- STATS -->
-          <!-- STATS -->
-<div class="about_stats">
-
-  <div class="stat_item">
-
-    <div class="stat_icon">
-      <i class="fa fa-cutlery"></i>
-    </div>
-
-    <h3>100+</h3>
-    <p>Sản phẩm ăn vặt</p>
-
-  </div>
-
-  <div class="stat_item">
-
-    <div class="stat_icon">
-      <i class="fa fa-users"></i>
-    </div>
-
-    <h3>10K+</h3>
-    <p>Khách hàng</p>
-
-  </div>
-
-  <div class="stat_item">
-
-    <div class="stat_icon">
-      <i class="fa fa-phone"></i>
-    </div>
-
-    <h3>24/7</h3>
-    <p>Hỗ trợ đặt hàng</p>
-
-  </div>
-
-</div>
-
         </div>
-
       </div>
 
     </div>
@@ -117,482 +61,236 @@
   </div>
 </section>
 
-<!-- BEST SELLER SECTION -->
+<!-- BEST SELLER -->
 <section class="food_section">
   <div class="container">
-    <div class="heading_container heading_center mb-4">
-      <h2>🏆 Sản phẩm bán chạy</h2>
-    </div>
 
-    {% if best_sellers %}
+    <h2>🏆 Sản phẩm bán chạy</h2>
+
     <div class="row">
       {% for p in best_sellers %}
+
       <div class="col-sm-6 col-lg-3 mb-5">
         <div class="box">
-          <!-- IMAGE -->
+
           <div class="img-box">
             {% if p.image %}
-            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
-            {% else %}
-            <div
-              style="
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #999;
-                font-weight: 600;
-              "
-            >
-              Không có ảnh
-            </div>
+              <img src="{{ p.image.url }}" />
             {% endif %}
-            <!-- BEST SELLER BADGE -->
-            <div
-              style="
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-                color: #333;
-                padding: 8px 12px;
-                border-radius: 50%;
-                width: 70px;
-                height: 70px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                text-align: center;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                font-size: 12px;
-                line-height: 1.2;
-              "
-            >
-              <span style="font-size: 18px; margin-bottom: 2px">⭐</span>
-              <span>BEST<br />SELLER</span>
-            </div>
           </div>
 
-          <!-- DETAIL -->
           <div class="detail-box">
-            <div>
-              <h5>
-                <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
-              </h5>
-              <h6>{{ p.price|vnd }} VND</h6>
-            </div>
+            <h5>{{ p.name }}</h5>
+            <h6>{{ p.price|vnd }} VND</h6>
 
-            <div>
-              {% if user.is_authenticated %}
-              <a
-                href="{% url 'add_to_cart' p.id %}"
-                class="btn btn-warning w-100"
-              >
+            {% if user.is_authenticated %}
+              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
                 🛒 Thêm vào giỏ
               </a>
-              {% else %}
+            {% else %}
               <a href="{% url 'login' %}" class="btn btn-light w-100">
                 🔐 Đăng nhập
               </a>
-              {% endif %}
-            </div>
+            {% endif %}
+
           </div>
+
         </div>
       </div>
+
       {% endfor %}
     </div>
-    {% endif %}
+
   </div>
 </section>
 
-<!-- NEW PRODUCTS SECTION -->
-<section class="food_section" style="background-color: #f9f9f9">
+<!-- NEW PRODUCTS -->
+<section class="food_section" style="background:#f9f9f9">
 
   <div class="container">
-
-    <div class="heading_container heading_center mb-4">
-      <h2>🏆 Sản phẩm mới</h2>
-    </div>
-
-    {% if new_products %}
+    <h2>🔥 Sản phẩm mới</h2>
 
     <div class="row">
-
       {% for p in new_products %}
 
       <div class="col-sm-6 col-lg-3 mb-5">
-            <div class="box">
-              <!-- IMAGE -->
-              <div class="img-box">
-                {% if p.image %}
-                <img src="{{ p.image.url }}" alt="{{ p.name }}" />
-                {% else %}
-                <div
-                  style="
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #999;
-                    font-weight: 600;
-                  "
-                >
-                  Không có ảnh
-                </div>
-                {% endif %}
-              </div>
 
-              <!-- DETAIL -->
-              <div class="detail-box">
-                <div>
-                  <h5>
-                    <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
-                  </h5>
-                  <h6>{{ p.price|vnd }} VND</h6>
-                </div>
+        <div class="box">
 
-                <div>
-                  {% if user.is_authenticated %}
-                  <a
-                    href="{% url 'add_to_cart' p.id %}"
-                    class="btn btn-warning w-100"
-                  >
-                    🛒 Thêm vào giỏ
-                  </a>
-                  {% else %}
-                  <a href="{% url 'login' %}" class="btn btn-light w-100">
-                    🔐 Đăng nhập
-                  </a>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
+          <div class="img-box">
+            {% if p.image %}
+              <img src="{{ p.image.url }}" />
+            {% endif %}
           </div>
-          {% endfor %}
+
+          <div class="detail-box">
+            <h5>{{ p.name }}</h5>
+            <h6>{{ p.price|vnd }} VND</h6>
+
+            {% if user.is_authenticated %}
+              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
+                🛒 Thêm vào giỏ
+              </a>
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-light w-100">
+                🔐 Đăng nhập
+              </a>
+            {% endif %}
+
+          </div>
+
         </div>
-        {% endif %}
+
       </div>
+
+      {% endfor %}
     </div>
+
   </div>
 </section>
 
+<!-- CATEGORY -->
 <section class="food_section">
+
   <div class="container">
-    <!-- CATEGORY -->
-    <div class="category_wrapper">
-      <div class="heading_container heading_center mb-4">
-        <h2>✨ Danh mục sản phẩm</h2>
-      </div>
-      <div class="text-center mb-5">
-        <a href="{% url 'all_products' %}" class="view_all_btn">
-        Xem tất cả sản phẩm →
-        </a>
-      </div>
 
-      <div class="category_menu">
-        <!-- CATEGORY -->
-        {% for c in categories|slice:":8"  %}
+    <h2>✨ Danh mục sản phẩm</h2>
 
-        <a
-          href="{% url 'category_products' c.id %}"
-          class="category_btn {% if selected_category.id == c.id %}active_category{% endif %}"
-        >
-          {{ c.name }}
-        </a>
+    <div class="category_menu">
 
-        {% endfor %}
-      </div>
+      {% for c in categories|slice:":8" %}
+
+      <a
+        href="{% url 'category_products' c.id %}"
+        class="category_btn {% if selected_category and selected_category.id == c.id %}active_category{% endif %}"
+      >
+        {{ c.name }}
+      </a>
+
+      {% endfor %}
+
     </div>
 
-    <!-- PRODUCTS -->
     <div class="row">
+
       {% for p in products|slice:":8" %}
 
       <div class="col-sm-6 col-lg-3 mb-5">
         <div class="box">
-          <!-- IMAGE -->
+
           <div class="img-box">
             {% if p.image %}
-
-            <img src="{{ p.image.url }}" alt="{{ p.name }}" />
-
-            {% else %}
-
-            <div
-              style="
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #999;
-                font-weight: 600;
-              "
-            >
-              Không có ảnh
-            </div>
-
+              <img src="{{ p.image.url }}" />
             {% endif %}
           </div>
 
-          <!-- DETAIL -->
           <div class="detail-box">
-            <div>
-              <h5>
-                <a href="{% url 'product_detail' p.id %}"> {{ p.name }} </a>
-              </h5>
+            <h5>{{ p.name }}</h5>
+            <h6>{{ p.price|vnd }} VND</h6>
 
-              <h6>{{ p.price|vnd }} VND</h6>
-            </div>
-
-            <div>
-              {% if user.is_authenticated %}
-
-              <a
-                href="{% url 'add_to_cart' p.id %}"
-                class="btn btn-warning w-100"
-              >
+            {% if user.is_authenticated %}
+              <a href="{% url 'add_to_cart' p.id %}" class="btn btn-warning w-100">
                 🛒 Thêm vào giỏ
               </a>
-
-              {% else %}
-
+            {% else %}
               <a href="{% url 'login' %}" class="btn btn-light w-100">
                 🔐 Đăng nhập
               </a>
+            {% endif %}
 
-              {% endif %}
-            </div>
           </div>
+
         </div>
       </div>
 
       {% empty %}
-
       <div class="col-12">
-        <div class="no-products">
-          <h2>❌ Không có sản phẩm</h2>
-
-          <p>Hãy quay lại sau để xem các sản phẩm mới!</p>
-        </div>
+        <h3>Không có sản phẩm</h3>
       </div>
-
       {% endfor %}
+
     </div>
+
   </div>
 </section>
-<!-- ========================= -->
-<!-- SHOP REVIEWS -->
-<!-- ========================= -->
 
+<!-- REVIEWS -->
 <section class="shop_review_section">
 
   <div class="container">
 
     <div class="review_wrapper">
 
-      <!-- ================= LEFT ================= -->
+      <!-- LEFT -->
       <div class="review_showcase">
 
-        <div class="review_title">
-          <h2>💬 Khách hàng nói gì?</h2>
-          <p>
-            Những đánh giá chân thật từ khách hàng SnackShop
-          </p>
-        </div>
+        <h2>💬 Khách hàng nói gì?</h2>
 
-        <!-- AUTO SCROLL -->
         <div class="review_stack">
-
           <div class="review_stack_inner">
 
-            <!-- LOOP 1 -->
-            {% for r in shop_reviews %}
+            {% for r in shop_reviews|default:'' %}
 
             <div class="review_card">
 
               <div class="review_top">
 
                 <div class="review_avatar">
-                  {{ r.user.username|slice:":1" }}
+                  {{ r.user.username|default:"U"|slice:":1" }}
                 </div>
 
                 <div>
-
-                  <h5>
-                    {{ r.user.username }}
-                  </h5>
+                  <h5>{{ r.user.username|default:"User" }}</h5>
 
                   <div class="review_stars">
-
                     {% for i in "12345" %}
                       {% if forloop.counter <= r.rating %}
                         ⭐
                       {% endif %}
                     {% endfor %}
-
                   </div>
 
                 </div>
 
               </div>
 
-              <p class="review_text">
-                "{{ r.message }}"
-              </p>
-
-            </div>
-
-            {% endfor %}
-
-
-            <!-- DUPLICATE -->
-            {% for r in shop_reviews %}
-
-            <div class="review_card">
-
-              <div class="review_top">
-
-                <div class="review_avatar">
-                  {{ r.user.username|slice:":1" }}
-                </div>
-
-                <div>
-
-                  <h5>
-                    {{ r.user.username }}
-                  </h5>
-
-                  <div class="review_stars">
-
-                    {% for i in "12345" %}
-                      {% if forloop.counter <= r.rating %}
-                        ⭐
-                      {% endif %}
-                    {% endfor %}
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <p class="review_text">
-                "{{ r.message }}"
-              </p>
+              <p>"{{ r.message }}"</p>
 
             </div>
 
             {% endfor %}
 
           </div>
-
         </div>
 
       </div>
 
-      <!-- ================= RIGHT ================= -->
+      <!-- RIGHT -->
       <div class="review_form_box">
 
-        <h2>✨ Đánh giá cửa hàng</h2>
-
-        <p>
-          Chia sẻ trải nghiệm của bạn với SnackShop
-        </p>
+        <h2>✨ Đánh giá</h2>
 
         {% if user.is_authenticated %}
 
-        <!-- AJAX FORM -->
         <form id="shopReviewForm">
-
           {% csrf_token %}
 
-          <!-- RATING -->
-          <div class="form_group">
+          <select name="rating">
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+          </select>
 
-            <label>⭐ Rating</label>
+          <textarea name="message" required></textarea>
 
-            <select
-              name="rating"
-              class="review_select"
-            >
-
-              <option value="5">
-                ⭐⭐⭐⭐⭐
-              </option>
-
-              <option value="4">
-                ⭐⭐⭐⭐
-              </option>
-
-              <option value="3">
-                ⭐⭐⭐
-              </option>
-
-              <option value="2">
-                ⭐⭐
-              </option>
-
-              <option value="1">
-                ⭐
-              </option>
-
-            </select>
-
-          </div>
-
-          <!-- MESSAGE -->
-          <div class="form_group">
-
-            <label>
-              💭 Nội dung đánh giá
-            </label>
-
-            <textarea
-              name="message"
-              rows="5"
-              placeholder="Viết cảm nhận của bạn..."
-              required
-            ></textarea>
-
-          </div>
-
-          <!-- BUTTON -->
-          <button
-            type="submit"
-            class="submit_review_btn"
-          >
-            🚀 Gửi đánh giá
-          </button>
+          <button type="submit">Gửi</button>
 
         </form>
 
         {% else %}
-
-        <!-- LOGIN REQUIRED -->
-        <div class="review_login_require">
-
-          <h4>
-            🔒 Bạn cần đăng nhập
-          </h4>
-
-          <p>
-            Đăng nhập để gửi đánh giá cho SnackShop
-          </p>
-
-          <a
-            href="{% url 'login' %}"
-            class="review_login_btn"
-          >
-            Đăng nhập ngay
-          </a>
-
-        </div>
-
+          <p>Đăng nhập để đánh giá</p>
         {% endif %}
 
       </div>
@@ -603,88 +301,26 @@
 
 </section>
 
-
-<!-- ========================= -->
-<!-- AJAX REVIEW -->
-<!-- ========================= -->
-
 <script>
-
 const form = document.getElementById("shopReviewForm");
 
 if(form){
-
-  form.addEventListener("submit", async function(e){
-
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(form);
-
-    const response = await fetch("{% url 'add_shop_review' %}", {
-
+    const res = await fetch("{% url 'add_shop_review' %}", {
       method: "POST",
-
-      body: formData,
-
-      headers:{
-        "X-Requested-With":"XMLHttpRequest"
-      }
-
+      body: new FormData(form),
+      headers: { "X-Requested-With": "XMLHttpRequest" }
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
     if(data.success){
-
-      const stars = "⭐".repeat(data.rating);
-
-      const html = `
-
-      <div class="review_card new_review">
-
-        <div class="review_top">
-
-          <div class="review_avatar">
-            ${data.username.charAt(0)}
-          </div>
-
-          <div>
-
-            <h5>
-              ${data.username}
-            </h5>
-
-            <div class="review_stars">
-              ${stars}
-            </div>
-
-          </div>
-
-        </div>
-
-        <p class="review_text">
-          "${data.message}"
-        </p>
-
-      </div>
-
-      `;
-
-      const stack = document.querySelector(".review_stack_inner");
-
-      stack.insertAdjacentHTML(
-        "afterbegin",
-        html
-      );
-
-      form.reset();
-
+      location.reload();
     }
-
   });
-
 }
-
 </script>
 
 {% endblock %}
