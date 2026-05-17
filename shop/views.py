@@ -20,40 +20,30 @@ from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewF
 # =========================
 def home(request):
 
-    # admin redirect
-    def admin_dashboard(request):
-        if not request.user.is_superuser:
-         return redirect('home')
-
     q = request.GET.get('q')
 
-    # base query
     products = Product.objects.all().order_by('-id')
     categories = Category.objects.all()
 
-    # search
     if q:
         products = products.filter(name__icontains=q)
 
-    # best sellers (fix chắc chắn không lỗi nếu chưa có order)
+    # SAFE BEST SELLER
     best_sellers = (
         Product.objects
-        .annotate(total_sold=Count('orderitem'))
+        .annotate(total_sold=Count('orderitem'))  # kiểm tra đúng related_name
         .order_by('-total_sold')[:4]
     )
 
-    # new products
     new_products = Product.objects.order_by('-id')[:4]
 
-    # reviews
     shop_reviews = ShopReview.objects.all().order_by('-id')[:20]
 
-    # cart count safe (tránh lỗi user anonymous)
     cart_count = 0
     if request.user.is_authenticated:
         cart_count = get_cart_count(request.user)
 
-    context = {
+    return render(request, 'shop/home.html', {
         'products': products,
         'categories': categories,
         'selected_category': None,
@@ -62,9 +52,7 @@ def home(request):
         'shop_reviews': shop_reviews,
         'cart_count': cart_count,
         'q': q,
-    }
-
-    return render(request, 'shop/home.html', context)
+    })
 # =========================
 # REGISTER
 # =========================
