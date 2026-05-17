@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+
 {% block content %}
 
 <section class="payment_section">
@@ -24,7 +25,10 @@
     <!-- QR -->
     <div class="qr_box">
 
-        <img src="https://img.vietqr.io/image/MB-123456789-compact.png?amount={{ order.total_price }}&addInfo=DonHang{{ order.id }}&accountName=NGOC">
+        <img
+            src="{{ qr_url }}"
+            alt="QR Payment"
+        >
 
     </div>
 
@@ -41,7 +45,7 @@
         <div class="info_label">🧾 Nội dung chuyển khoản</div>
 
         <div id="transferContent" class="code_box">
-            DonHang{{ order.id }}
+            {{ order.order_code }}
         </div>
 
         <button class="copy_btn" onclick="copyText()">
@@ -50,19 +54,10 @@
 
     </div>
 
-    <!-- WARNING -->
-    <div class="warning">
-        ⚠️ Nhập đúng nội dung để hệ thống xác nhận tự động
+    <!-- STATUS BOX -->
+    <div id="statusBox" class="warning">
+        ⏳ Đang chờ thanh toán...
     </div>
-
-    <!-- BUTTON -->
-    <a href="{% url 'confirm_payment' order.id %}" class="btn_primary">
-        ✅ Tôi đã chuyển khoản
-    </a>
-
-    <a href="{% url 'orders' %}" class="btn_secondary">
-        ⬅ Quay lại
-    </a>
 
 </div>
 
@@ -71,11 +66,69 @@
 </section>
 
 <script>
+
 function copyText(){
     const text = document.getElementById("transferContent").innerText;
     navigator.clipboard.writeText(text);
-    alert("Đã copy nội dung!");
+    alert("Đã copy!");
 }
+
+let intervalId = null;
+let isDone = false;
+
+function updateStatus(message, type="warning") {
+
+    const box = document.getElementById("statusBox");
+
+    box.innerHTML = message;
+
+    box.className = type; // warning / success / error
+}
+
+function checkPayment(){
+
+    if (isDone) return;
+
+    fetch("{% url 'check_payment' order.order_code %}")
+        .then(res => res.json())
+        .then(data => {
+
+            if(data.status === "CONFIRMED"){
+
+                isDone = true;
+
+                updateStatus("✅ Thanh toán thành công! Đang chuyển hướng...", "success");
+
+                clearInterval(intervalId);
+
+                setTimeout(() => {
+                    window.location.href =
+                        "{% url 'order_success' order.order_code %}";
+                }, 1200);
+            }
+
+            else if(data.status === "CANCELLED"){
+
+                isDone = true;
+
+                updateStatus("❌ Đơn hàng đã bị huỷ", "error");
+
+                clearInterval(intervalId);
+            }
+
+            else if(data.status === "PENDING"){
+
+                updateStatus("⏳ Đang chờ thanh toán...", "warning");
+            }
+        })
+        .catch(() => {
+            updateStatus("⚠️ Lỗi kết nối server", "error");
+        });
+}
+
+// polling
+intervalId = setInterval(checkPayment, 3000);
+
 </script>
 
 {% endblock %}

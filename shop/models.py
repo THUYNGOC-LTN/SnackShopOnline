@@ -101,63 +101,56 @@ class Order(models.Model):
         ('CANCELLED', 'Đã hủy'),
     ]
 
-    PAYMENT_CHOICES = [
+    PAYMENT_METHOD_CHOICES = [
         ('COD', 'Thanh toán khi nhận hàng'),
         ('BANKING', 'Chuyển khoản'),
     ]
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
+    PAYMENT_STATUS = [
+        ('UNPAID', 'Chưa thanh toán'),
+        ('PENDING', 'Chờ thanh toán'),
+        ('PAID', 'Đã thanh toán'),
+        ('FAILED', 'Thanh toán thất bại'),
+    ]
 
-    # Mã đơn hàng
-    order_code = models.CharField(
-        max_length=20,
-        null=True,
-        blank=True
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    # Thông tin người nhận
+    order_code = models.CharField(max_length=20, unique=True, blank=True)
+
     fullname = models.CharField(max_length=200)
-
     phone = models.CharField(max_length=20)
-
     address = models.TextField()
 
-    # Tổng tiền
     total_price = models.PositiveIntegerField(default=0)
 
-    # Trạng thái
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='PENDING'
     )
 
-    # Thanh toán
     payment_method = models.CharField(
         max_length=20,
-        choices=PAYMENT_CHOICES,
+        choices=PAYMENT_METHOD_CHOICES,
         default='COD'
     )
 
-    # Thời gian đặt
-    created_at = models.DateTimeField(
-        auto_now_add=True
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS,
+        default='UNPAID'
     )
 
-    def save(self, *args, **kwargs):
+    created_at = models.DateTimeField(auto_now_add=True)
 
-        # Tạo mã đơn tự động
+    def save(self, *args, **kwargs):
         if not self.order_code:
-            self.order_code = "OD" + str(uuid.uuid4().hex[:8]).upper()
+            self.order_code = "OD" + uuid.uuid4().hex[:8].upper()
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.order_code
-
 
 # =========================
 # ORDER ITEM
@@ -261,3 +254,34 @@ class ShopReview(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+
+class Payment(models.Model):
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Chờ thanh toán'),
+        ('PAID', 'Đã thanh toán'),
+        ('FAILED', 'Thất bại'),
+    ]
+
+    order = models.OneToOneField(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="payment"
+    )
+
+    amount = models.PositiveIntegerField()
+
+    transaction_code = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)

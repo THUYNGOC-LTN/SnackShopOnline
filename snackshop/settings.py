@@ -203,3 +203,5 @@ SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_TRUSTED_ORIGINS = [
     "https://snackshoponline.onrender.com"
 ]
+
+SEPAY_SECRET = os.getenv("SEPAY_SECRET")

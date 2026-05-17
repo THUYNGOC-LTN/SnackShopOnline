@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -6,11 +8,12 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Q, Max
 from datetime import timedelta
 from django.utils import timezone
-from .models import ShopReview
+from .models import Payment, ShopReview
 from django.http import JsonResponse
 
 from .models import Category, Product, Cart, CartItem, Order, OrderItem, Review, UserProfile, Blog
 from .forms import ProductForm, UserProfileForm, UserProfilePictureForm, ReviewForm, BlogForm
+
 
 # =========================
 # HOME + SEARCH
@@ -218,109 +221,82 @@ def checkout(request):
     if request.user.is_staff:
         return redirect('admin_dashboard')
 
-    # Lấy giỏ hàng
+    # =========================
+    # LẤY GIỎ HÀNG
+    # =========================
     cart, created = Cart.objects.get_or_create(
         user=request.user
     )
 
-    items = CartItem.objects.filter(
-        cart=cart
-    )
+    items = CartItem.objects.filter(cart=cart)
 
     # Không có sản phẩm
     if not items.exists():
+        messages.error(request, "Giỏ hàng trống")
         return redirect('home')
 
     # =========================
     # TÍNH TỔNG TIỀN
     # =========================
-    total = 0
-
-    for item in items:
-
-        total += (
-            item.product.price *
-            item.quantity
-        )
+    total = sum(
+        item.product.price * item.quantity
+        for item in items
+    )
 
     # =========================
-    # ĐẶT HÀNG
+    # XỬ LÝ POST (ĐẶT HÀNG)
     # =========================
     if request.method == 'POST':
 
-        fullname = request.POST.get(
-            'fullname'
-        )
+        fullname = request.POST.get('fullname')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
 
-        phone = request.POST.get(
-            'phone'
-        )
-
-        address = request.POST.get(
-            'address'
-        )
-
-        payment_method = request.POST.get(
-            'payment_method',
-            'COD'
-        )
+        payment_method = request.POST.get('payment_method', 'COD')
 
         # VALIDATE
         if not fullname or not phone or not address:
-
-            messages.error(
-                request,
-                "Vui lòng nhập đầy đủ thông tin"
-            )
-
+            messages.error(request, "Vui lòng nhập đầy đủ thông tin")
             return redirect('checkout')
 
         # =========================
         # TẠO ORDER
         # =========================
         order = Order.objects.create(
-
             user=request.user,
-
             fullname=fullname,
-
             phone=phone,
-
             address=address,
-
             total_price=total,
-
             payment_method=payment_method,
-
             status='PENDING'
+        )   
 
+        # tạo payment luôn
+        Payment.objects.create(
+            order=order,
+            amount=total,
+            status='PENDING'
         )
 
         # =========================
         # TẠO ORDER ITEMS
         # =========================
         for item in items:
-
             OrderItem.objects.create(
-
                 order=order,
-
                 product=item.product,
-
                 quantity=item.quantity,
-
                 price=item.product.price
-
             )
+
         # =========================
-        # TĂNG SỐ LƯỢNG ĐÃ BÁN
+        # TĂNG SOLD COUNT (FIXED)
         # =========================
         for item in items:
             product = item.product
             product.sold_count += item.quantity
-
-        for item in items:
-            item.product.save()
+            product.save()
 
         # =========================
         # XÓA GIỎ HÀNG
@@ -328,17 +304,18 @@ def checkout(request):
         items.delete()
 
         # =========================
-        # BANKING
+        # BANKING FLOW (QR PAYMENT)
         # =========================
         if payment_method == 'BANKING':
 
+            # chuyển sang trang QR theo order_code (chuẩn hơn id)
             return redirect(
                 'payment_qr',
-                order_id=order.id
+                order_code=order.order_code
             )
 
         # =========================
-        # COD
+        # COD FLOW
         # =========================
         return redirect(
             'order_success',
@@ -346,7 +323,7 @@ def checkout(request):
         )
 
     # =========================
-    # HIỂN THỊ CHECKOUT
+    # RENDER CHECKOUT PAGE
     # =========================
     return render(
         request,
@@ -356,30 +333,6 @@ def checkout(request):
             'total': total
         }
     )
-
-
-# =========================
-# HELPER: CART COUNT
-# =========================
-def get_cart_count(user):
-
-    if user.is_authenticated:
-
-        cart, created = Cart.objects.get_or_create(
-            user=user
-        )
-
-        items = CartItem.objects.filter(
-            cart=cart
-        )
-
-        return sum(
-            item.quantity
-            for item in items
-        )
-
-    return 0
-
 
 # =========================
 # BLOG
@@ -964,3 +917,124 @@ def add_shop_review(request):
     return JsonResponse({
         "success": False
     })
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Order
+
+def payment_qr(request, order_code):
+
+    order = get_object_or_404(Order, order_code=order_code)
+
+    # chỉ banking mới vào QR page
+    if order.payment_method != "BANKING":
+        return redirect('order_success', order_code=order.order_code)
+
+    bank_id = "970436"       # MB Bank (ví dụ)
+    account = "0123456789"
+
+    # QUAN TRỌNG: content phải match webhook
+    content = order.order_code
+
+    # encode chống lỗi webhook
+    encoded_content = urllib.parse.quote(content)
+
+    qr_url = (
+        f"https://img.vietqr.io/image/{bank_id}-{account}-compact.png"
+        f"?amount={order.total_price}"
+        f"&addInfo={encoded_content}"
+    )
+
+    # set trạng thái chờ thanh toán
+    if order.status == "PENDING":
+        order.save()
+
+    return render(request, "shop/payment_qr.html", {
+        "order": order,
+        "qr_url": qr_url
+    })
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Order
+
+def check_payment(request, order_code):
+
+    order = get_object_or_404(Order, order_code=order_code)
+
+    return JsonResponse({
+        "status": order.status,
+        "order_code": order.order_code
+    })
+from django.shortcuts import get_object_or_404, redirect
+from .models import Order
+
+def confirm_payment(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.payment_method == "BANKING":
+        order.status = "CONFIRMED"
+        order.save()
+
+    return redirect('order_success', order_code=order.order_code)
+import json
+import hmac
+import hashlib
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from .models import Order
+
+
+def verify_sepay_signature(raw_body, signature):
+
+    secret = settings.SEPAY_SECRET.encode()
+
+    computed = hmac.new(
+        secret,
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(computed, signature)
+
+
+@csrf_exempt
+def payment_webhook(request):
+
+    if request.method != "POST":
+        return JsonResponse({"error": "invalid method"}, status=400)
+
+    raw_body = request.body
+    signature = request.headers.get("X-SePay-Signature")
+
+    # ❌ sai signature → reject
+    if not verify_sepay_signature(raw_body, signature):
+        return JsonResponse({"error": "invalid signature"}, status=403)
+
+    data = json.loads(raw_body)
+
+    """
+    SePay gửi:
+    {
+        "content": "OD123456",
+        "amount": 89000
+    }
+    """
+
+    order_code = data.get("content")
+    amount = data.get("amount")
+
+    order = Order.objects.filter(order_code=order_code).first()
+
+    if not order:
+        return JsonResponse({"error": "order not found"}, status=404)
+
+    # check tiền chống fake
+    if order.total_price != amount:
+        return JsonResponse({"error": "invalid amount"}, status=400)
+
+    # update trạng thái
+    order.status = "CONFIRMED"
+    order.save()
+
+    return JsonResponse({"message": "success"})

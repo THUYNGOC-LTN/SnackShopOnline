@@ -39,5 +39,6 @@ urlpatterns = [
     'shop-review/',
     views.add_shop_review,
     name='add_shop_review'
-),
+    ),
+    path('webhook/payment/', views.payment_webhook, name='payment_webhook'),
 ]
