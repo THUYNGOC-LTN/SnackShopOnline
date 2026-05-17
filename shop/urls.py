@@ -45,4 +45,9 @@ urlpatterns = [
     name='add_shop_review'
     ),
     path('webhook/payment/', views.payment_webhook, name='payment_webhook'),
+    path(
+    'check-payment/<str:order_code>/',
+    views.check_payment,
+    name='check_payment'
+    ),
 ]
