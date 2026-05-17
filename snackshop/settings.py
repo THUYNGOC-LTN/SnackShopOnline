@@ -149,13 +149,13 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': config('CLOUDINARY_API_SECRET'),
 }
 
-STORAGES ={
-    'default':{
-        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    'staticfiles':{
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    }
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
 # ========================
 # LOGIN / LOGOUT
