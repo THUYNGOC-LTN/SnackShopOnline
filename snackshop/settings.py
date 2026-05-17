@@ -4,6 +4,7 @@ from datetime import timedelta
 from decouple import config
 import dj_database_url
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ========================
@@ -143,8 +144,14 @@ CLOUDINARY_STORAGE = {
     'api_secret': config('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
+STORAGE ={
+    'default':{
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+    },
+    'staticfiles':{
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    }
+}
 # ========================
 # LOGIN / LOGOUT
 # ========================
