@@ -63,7 +63,9 @@
           target &&
           target.href &&
           !target.target &&
-          !target.classList.contains("add-to-cart-btn")
+          !target.classList.contains("add-to-cart-btn") &&
+          !target.classList.contains("qty-btn") &&
+          !target.classList.contains("remove-item-btn")
         ) {
           const href = target.getAttribute("href");
           if (

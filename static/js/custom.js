@@ -79,8 +79,44 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = await response.json();
 
         if (data.success) {
-          // Reload page to reflect changes
-          location.reload();
+          // Update quantity input smoothly
+          const cartCard = this.closest(".cart_card");
+          const qtyInput = cartCard.querySelector("input[type='number']");
+          const totalQtyDiv = cartCard.querySelector(".cart_total_qty");
+          const totalPriceDiv = cartCard.querySelector(".cart_total_price");
+
+          if (qtyInput) {
+            qtyInput.value = data.quantity;
+          }
+
+          // Format currency
+          const priceText =
+            qtyInput.value +
+            " x " +
+            new Intl.NumberFormat("vi-VN").format(
+              data.item_total / data.quantity,
+            ) +
+            ".000";
+
+          if (totalQtyDiv) {
+            totalQtyDiv.innerText = priceText;
+          }
+
+          if (totalPriceDiv) {
+            totalPriceDiv.innerText =
+              new Intl.NumberFormat("vi-VN").format(data.item_total) +
+              ".000 VND";
+          }
+
+          // Update cart summary
+          const cartTotalPrice = document.getElementById("cart-total-price");
+          if (cartTotalPrice) {
+            cartTotalPrice.innerText =
+              new Intl.NumberFormat("vi-VN").format(data.cart_total) +
+              ".000 VND";
+          }
+
+          this.disabled = false;
         } else {
           alert(
             "❌ Có lỗi xảy ra: " +
@@ -121,8 +157,41 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = await response.json();
 
         if (data.success) {
-          // Reload page to reflect changes
-          location.reload();
+          // Remove the cart card smoothly
+          const cartCard = this.closest(".cart_card");
+          if (cartCard) {
+            cartCard.style.transition =
+              "opacity 0.3s ease, transform 0.3s ease";
+            cartCard.style.opacity = "0";
+            cartCard.style.transform = "translateX(20px)";
+
+            setTimeout(() => {
+              cartCard.remove();
+
+              // Update cart summary
+              const cartTotalPrice =
+                document.getElementById("cart-total-price");
+              if (cartTotalPrice) {
+                cartTotalPrice.innerText =
+                  new Intl.NumberFormat("vi-VN").format(data.cart_total) +
+                  ".000 VND";
+              }
+
+              const cartItemsCount =
+                document.getElementById("cart-items-count");
+              if (cartItemsCount) {
+                const itemCount =
+                  document.querySelectorAll(".cart_card").length;
+                cartItemsCount.innerText = itemCount + " sản phẩm";
+              }
+
+              // Check if cart is empty
+              const remainingCards = document.querySelectorAll(".cart_card");
+              if (remainingCards.length === 0) {
+                location.reload();
+              }
+            }, 300);
+          }
         } else {
           alert(
             "❌ Có lỗi xảy ra: " + (data.message || "Không thể xóa sản phẩm"),
