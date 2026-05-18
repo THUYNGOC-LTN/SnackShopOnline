@@ -56,6 +56,86 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  // Cart quantity adjustment (increase/decrease)
+  const qtyButtons = document.querySelectorAll(".qty-btn");
+
+  qtyButtons.forEach((button) => {
+    button.addEventListener("click", async function () {
+      const url = this.getAttribute("data-url");
+      const originalText = this.innerText;
+
+      // Disable button
+      this.disabled = true;
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Reload page to reflect changes
+          location.reload();
+        } else {
+          alert(
+            "❌ Có lỗi xảy ra: " +
+              (data.message || "Không thể cập nhật số lượng"),
+          );
+          this.disabled = false;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Có lỗi xảy ra");
+        this.disabled = false;
+      }
+    });
+  });
+
+  // Remove item from cart
+  const removeButtons = document.querySelectorAll(".remove-item-btn");
+
+  removeButtons.forEach((button) => {
+    button.addEventListener("click", async function () {
+      const url = this.getAttribute("data-url");
+
+      if (!confirm("Bạn chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+        return;
+      }
+
+      // Disable button
+      this.disabled = true;
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Reload page to reflect changes
+          location.reload();
+        } else {
+          alert(
+            "❌ Có lỗi xảy ra: " + (data.message || "Không thể xóa sản phẩm"),
+          );
+          this.disabled = false;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Có lỗi xảy ra");
+        this.disabled = false;
+      }
+    });
+  });
 });
 
 // isotope js

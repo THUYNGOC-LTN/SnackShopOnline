@@ -221,11 +221,6 @@ def update_quantity(request, item_id):
 @login_required
 def remove_from_cart(request, item_id):
 
-    if request.method != "POST":
-        return JsonResponse({
-            "success": False
-        })
-
     item = get_object_or_404(
         CartItem,
         id=item_id,
