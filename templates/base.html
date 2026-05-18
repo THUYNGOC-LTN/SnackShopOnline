@@ -1,35 +1,40 @@
 {% load static %}
-{% include 'navbar.html' %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<head>
-    <meta charset="UTF-8">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+  <head>
+    <meta charset="UTF-8" />
     <title>SnackShop</title>
 
     {% include 'includes/header.html' %}
 
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
-</head>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}" />
+  </head>
 
-<body>
+  <body>
+    <!-- LOADING PAGE -->
+    <div id="loading-page">
+      <div class="loader-container">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">SnackShop</p>
+        <p class="loader-subtext">Thiên đường đồ ăn vặt...</p>
+      </div>
+    </div>
 
     <!-- NAVBAR LUÔN HIỆN -->
     {% include 'navbar.html' %}
 
     <!-- HERO CHỈ HIỆN KHI CẦN -->
-    {% block hero %}
-    {% endblock %}
+    {% block hero %} {% endblock %}
 
     <!-- CONTENT -->
-    <main style="margin-top: 90px;">
-        {% block content %}
-        {% endblock %}
-    </main>
+    <main style="margin-top: 90px">{% block content %} {% endblock %}</main>
 
     <!-- FOOTER -->
     {% include 'includes/footer.html' %}
@@ -39,5 +44,39 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     <script src="{% static 'js/bootstrap.js' %}"></script>
     <script src="{% static 'js/custom.js' %}"></script>
 
-</body>
+    <!-- LOADING PAGE SCRIPT -->
+    <script>
+      // Hide loading page when DOM is ready
+      document.addEventListener("DOMContentLoaded", function () {
+        const loadingPage = document.getElementById("loading-page");
+        if (loadingPage) {
+          setTimeout(function () {
+            loadingPage.classList.add("hidden");
+          }, 500);
+        }
+      });
+
+      // Show loading page on page navigation
+      document.addEventListener("click", function (e) {
+        const target = e.target.closest("a");
+        if (
+          target &&
+          target.href &&
+          !target.target &&
+          !target.classList.contains("add-to-cart-btn")
+        ) {
+          const href = target.getAttribute("href");
+          if (
+            href.startsWith("http") === false ||
+            href.includes(window.location.hostname)
+          ) {
+            const loadingPage = document.getElementById("loading-page");
+            if (loadingPage) {
+              loadingPage.classList.remove("hidden");
+            }
+          }
+        }
+      });
+    </script>
+  </body>
 </html>
