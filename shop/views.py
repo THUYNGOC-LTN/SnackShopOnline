@@ -1148,129 +1148,280 @@ def add_shop_review(request):
         "success": False
     })
 
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Order
-
-def payment_qr(request, order_code):
-
-    order = get_object_or_404(Order, order_code=order_code)
-
-    # chỉ banking mới vào QR page
-    if order.payment_method != "BANKING":
-        return redirect('order_success', order_code=order.order_code)
-
-    # ❌ chặn order đã thanh toán
-    if order.status != "PENDING":
-        return redirect('order_success', order_code=order.order_code)
-
-    bank_id = "TPBANK"
-    account_no = "38788393939"
-
-    content = order.order_code
-    encoded_content = urllib.parse.quote(content)
-
-    qr_url = (
-        f"https://img.vietqr.io/image/{bank_id}-{account_no}-compact.png"
-        f"?amount={int(order.total_price)}"
-        f"&addInfo={encoded_content}"
-    )
-
-    return render(request, "shop/payment_qr.html", {
-        "order": order,
-        "qr_url": qr_url
-    })
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Order
-
-def check_payment(request, order_code):
-
-    order = get_object_or_404(Order, order_code=order_code)
-
-    # chỉ trả minimal data (không expose DB logic)
-    return JsonResponse({
-        "status": order.status
-    })
-from django.shortcuts import get_object_or_404, redirect
-from .models import Order
-
-def confirm_payment(request, order_id):
-
-    order = get_object_or_404(Order, id=order_id)
-
-    if order.status == "CONFIRMED":
-        return redirect('order_success', order_code=order.order_code)
-
-    if order.payment_method == "BANKING":
-        order.status = "CONFIRMED"
-        order.save()
-
-    return redirect('order_success', order_code=order.order_code)
+import urllib.parse
 import json
 import hmac
 import hashlib
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 from django.conf import settings
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import Order
 
 
+# =========================
+# PAYMENT QR
+# =========================
+def payment_qr(request, order_code):
+
+    order = get_object_or_404(
+        Order,
+        order_code=order_code
+    )
+
+    # chỉ BANKING mới được vào
+    if order.payment_method != "BANKING":
+        return redirect(
+            'order_success',
+            order_code=order.order_code
+        )
+
+    # nếu đã thanh toán rồi
+    if order.status == "CONFIRMED":
+        return redirect(
+            'order_success',
+            order_code=order.order_code
+        )
+
+    # nếu đã huỷ
+    if order.status == "CANCELLED":
+        return redirect('orders')
+
+    # =========================
+    # BANK INFO
+    # =========================
+    bank_id = "TPBANK"
+    account_no = "38788393939"
+
+    # nội dung CK
+    content = order.order_code
+
+    encoded_content = urllib.parse.quote(content)
+
+    # QR URL
+    qr_url = (
+        f"https://img.vietqr.io/image/"
+        f"{bank_id}-{account_no}-compact2.png"
+        f"?amount={int(order.total_price)}"
+        f"&addInfo={encoded_content}"
+        f"&accountName=NGUYEN%20NGOC"
+    )
+
+    return render(
+        request,
+        "shop/payment_qr.html",
+        {
+            "order": order,
+            "qr_url": qr_url
+        }
+    )
+
+
+# =========================
+# CHECK PAYMENT STATUS
+# =========================
+def check_payment(request, order_code):
+
+    order = get_object_or_404(
+        Order,
+        order_code=order_code
+    )
+
+    return JsonResponse({
+        "status": order.status
+    })
+
+
+# =========================
+# CONFIRM PAYMENT MANUAL
+# =========================
+def confirm_payment(request, order_id):
+
+    order = get_object_or_404(
+        Order,
+        id=order_id
+    )
+
+    # tránh confirm nhiều lần
+    if order.status == "CONFIRMED":
+        return redirect(
+            'order_success',
+            order_code=order.order_code
+        )
+
+    # chỉ BANKING
+    if order.payment_method == "BANKING":
+
+        order.status = "CONFIRMED"
+
+        order.save()
+
+    return redirect(
+        'order_success',
+        order_code=order.order_code
+    )
+
+
+# =========================
+# VERIFY SEPAY SIGNATURE
+# =========================
 def verify_sepay_signature(raw_body, signature):
+
+    # nếu chưa cấu hình secret
+    if not hasattr(settings, "SEPAY_SECRET"):
+        return False
 
     secret = settings.SEPAY_SECRET.encode()
 
-    computed = hmac.new(
+    computed_signature = hmac.new(
         secret,
         raw_body,
         hashlib.sha256
     ).hexdigest()
 
-    return hmac.compare_digest(computed, signature)
+    return hmac.compare_digest(
+        computed_signature,
+        signature or ""
+    )
 
 
+# =========================
+# PAYMENT WEBHOOK
+# =========================
 @csrf_exempt
 def payment_webhook(request):
 
     if request.method != "POST":
-        return JsonResponse({"error": "invalid method"}, status=400)
+        return JsonResponse(
+            {"error": "invalid method"},
+            status=400
+        )
 
+    # =========================
+    # RAW DATA
+    # =========================
     raw_body = request.body
-    signature = request.headers.get("X-SePay-Signature")
 
-    if not verify_sepay_signature(raw_body, signature):
-        return JsonResponse({"error": "invalid signature"}, status=403)
+    signature = request.headers.get(
+        "X-SePay-Signature"
+    )
 
+    # =========================
+    # VERIFY SIGNATURE
+    # =========================
+    if not verify_sepay_signature(
+        raw_body,
+        signature
+    ):
+        return JsonResponse(
+            {"error": "invalid signature"},
+            status=403
+        )
+
+    # =========================
+    # PARSE JSON
+    # =========================
     try:
+
         data = json.loads(raw_body)
-    except:
-        return JsonResponse({"error": "invalid json"}, status=400)
 
-    order_code = data.get("content")
-    amount = int(data.get("amount", 0))
+    except Exception:
 
+        return JsonResponse(
+            {"error": "invalid json"},
+            status=400
+        )
+
+    """
+    DATA EXAMPLE:
+
+    {
+        "content": "OD01429E5C",
+        "amount": 18000
+    }
+    """
+
+    # =========================
+    # GET DATA
+    # =========================
+    order_code = str(
+        data.get("content", "")
+    ).strip()
+
+    amount = int(
+        data.get("amount", 0)
+    )
+
+    # =========================
+    # VALIDATE
+    # =========================
     if not order_code:
-        return JsonResponse({"error": "missing order_code"}, status=400)
 
-    order = Order.objects.filter(order_code=order_code).first()
+        return JsonResponse(
+            {"error": "missing order_code"},
+            status=400
+        )
+
+    # =========================
+    # FIND ORDER
+    # =========================
+    order = Order.objects.filter(
+        order_code=order_code
+    ).first()
 
     if not order:
-        return JsonResponse({"error": "order not found"}, status=404)
 
-    # chống fake amount
+        return JsonResponse(
+            {"error": "order not found"},
+            status=404
+        )
+
+    # =========================
+    # CHECK AMOUNT
+    # =========================
     if int(order.total_price) != amount:
-        return JsonResponse({"error": "invalid amount"}, status=400)
 
-    # idempotent
+        return JsonResponse(
+            {"error": "invalid amount"},
+            status=400
+        )
+
+    # =========================
+    # IDEMPOTENT
+    # =========================
     if order.status == "CONFIRMED":
-        return JsonResponse({"message": "already confirmed"})
+
+        return JsonResponse({
+            "message": "already confirmed"
+        })
 
     if order.status == "CANCELLED":
-        return JsonResponse({"error": "order cancelled"}, status=400)
 
-    # 🔥 LOCK LOGIC (tránh double update)
-    Order.objects.filter(
+        return JsonResponse(
+            {"error": "order cancelled"},
+            status=400
+        )
+
+    # =========================
+    # UPDATE STATUS
+    # =========================
+    updated = Order.objects.filter(
         order_code=order_code,
         status="PENDING"
-    ).update(status="CONFIRMED")
+    ).update(
+        status="CONFIRMED"
+    )
 
-    return JsonResponse({"message": "success"})
+    # update fail
+    if updated == 0:
+
+        return JsonResponse(
+            {"error": "update failed"},
+            status=400
+        )
+
+    return JsonResponse({
+        "message": "success"
+    })
