@@ -1175,7 +1175,7 @@ def payment_qr(request, order_code):
     encoded_content = urllib.parse.quote(content)
 
     qr_url = (
-        f"https://img.vietqr.io/image/{bank_bin}-{account_no}-compact.png"
+        f"https://img.vietqr.io/image/{bank_id}-{account_no}-compact.png"
         f"?amount={int(order.total_price)}"
         f"&addInfo={encoded_content}"
     )
