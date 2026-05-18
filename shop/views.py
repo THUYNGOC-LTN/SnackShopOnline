@@ -1168,7 +1168,7 @@ def payment_qr(request, order_code):
     if order.status != "PENDING":
         return redirect('order_success', order_code=order.order_code)
 
-    bank_bin = "970407"
+    bank_id = "TPBANK"
     account_no = "38788393939"
 
     content = order.order_code
