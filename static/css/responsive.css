@@ -33,6 +33,21 @@
     font-size: 3rem;
   }
 
+  .search-form {
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    min-width: 200px;
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+  }
+
+  .search-btn {
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+  }
+
   .offer_section .box {
     flex-direction: column;
     align-items: center;
@@ -80,9 +95,38 @@
 }
 
 @media (max-width: 576px) {
+  .search-form {
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 15px;
+  }
+
+  .search-input {
+    width: 100% !important;
+    min-width: auto !important;
+    font-size: 14px !important;
+  }
+
+  .search-btn {
+    width: 100% !important;
+    font-size: 14px !important;
+  }
 }
 
 @media (max-width: 480px) {
+  .slider_section .detail-box h2 {
+    font-size: 18px;
+  }
+
+  .search-input {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .search-btn {
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+  }
 }
 
 @media (max-width: 430px) {

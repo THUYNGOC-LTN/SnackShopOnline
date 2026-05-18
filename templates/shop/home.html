@@ -21,7 +21,7 @@
 
         <form
           method="GET"
-          class="d-flex justify-content-center"
+          class="search-form d-flex justify-content-center align-items-center"
           style="margin-top: 30px"
         >
           <input
@@ -29,31 +29,9 @@
             name="q"
             value="{{ request.GET.q }}"
             placeholder="Hãy nhập tên sản phẩm cần tìm..."
-            class="form-control"
-            style="
-              max-width: 400px;
-              border-radius: 30px;
-              padding: 12px 20px;
-              border: 2px solid #ffbe33;
-              background: rgba(255, 255, 255, 0.95);
-              font-size: 14px;
-            "
+            class="search-input form-control"
           />
-          <button
-            type="submit"
-            class="btn ms-2"
-            style="
-              background-color: #ffbe33;
-              color: #fff;
-              border-radius: 30px;
-              padding: 12px 30px;
-              font-weight: 600;
-              transition: all 0.3s;
-              border: none;
-            "
-          >
-            🔍 Tìm kiếm
-          </button>
+          <button type="submit" class="search-btn btn">🔍 Tìm kiếm</button>
         </form>
       </div>
     </div>
