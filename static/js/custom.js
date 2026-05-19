@@ -25,12 +25,36 @@ function getCookie(name) {
 
 const csrftoken = getCookie("csrftoken");
 
+// Function to update cart count in navbar
+function updateCartCount(count) {
+  const cartLink = document.querySelector(".cart_link");
+  if (!cartLink) return;
+
+  // Find or create the badge
+  let badge = cartLink.querySelector(".badge");
+  if (!badge && count > 0) {
+    badge = document.createElement("span");
+    badge.className = "badge";
+    cartLink.appendChild(badge);
+  }
+
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = "inline";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+}
+
 // Add to cart functionality with loading indicator
 document.addEventListener("DOMContentLoaded", function () {
   const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
 
   addToCartButtons.forEach((button) => {
-    button.addEventListener("click", async function () {
+    button.addEventListener("click", async function (e) {
+      e.preventDefault();
       const url = this.getAttribute("data-url");
       const originalText = this.innerText;
 
@@ -49,21 +73,27 @@ document.addEventListener("DOMContentLoaded", function () {
         const response = await fetch(url, {
           method: "GET",
           headers: headers,
+          credentials: "same-origin",
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const data = await response.json();
 
         if (data.success) {
           this.innerText = "✅ Đã thêm vào giỏ!";
+
+          // Update cart count in navbar
+          if (data.cart_count !== undefined) {
+            updateCartCount(data.cart_count);
+          }
+
           setTimeout(() => {
             this.innerText = originalText;
             this.disabled = false;
           }, 2000);
-
-          // Update cart count if available
-          if (window.updateCartCount) {
-            updateCartCount();
-          }
         } else {
           alert(
             "❌ Có lỗi xảy ra: " + (data.message || "Không thể thêm vào giỏ"),
@@ -72,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
           this.disabled = false;
         }
       } catch (error) {
-        console.error("Error:", error);
-        alert("❌ Có lỗi xảy ra");
+        console.error("Add to cart error:", error);
+        alert("❌ Có lỗi xảy ra: " + error.message);
         this.innerText = originalText;
         this.disabled = false;
       }

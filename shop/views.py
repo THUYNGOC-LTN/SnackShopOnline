@@ -141,7 +141,8 @@ def add_to_cart(request, product_id):
 
     if request.user.is_staff:
         return JsonResponse({
-            'success': False
+            'success': False,
+            'message': 'Admin không thể thêm hàng vào giỏ'
         })
 
     product = get_object_or_404(
