@@ -1164,170 +1164,63 @@ from .models import Order
 # =========================
 # PAYMENT QR
 # =========================
-def payment_qr(request, order_code):
-
-    order = get_object_or_404(
-        Order,
-        order_code=order_code
-    )
-
-    # chỉ BANKING mới được vào
-    if order.payment_method != "BANKING":
-        return redirect(
-            'order_success',
-            order_code=order.order_code
-        )
-
-    # nếu đã thanh toán rồi
-    if order.status == "CONFIRMED":
-        return redirect(
-            'order_success',
-            order_code=order.order_code
-        )
-
-    # nếu đã huỷ
-    if order.status == "CANCELLED":
-        return redirect('orders')
-
-    # =========================
-    # BANK INFO
-    # =========================
-    bank_id = "TPBANK"
-    account_no = "38788393939"
-
-    # nội dung CK
-    content = order.order_code
-
-    encoded_content = urllib.parse.quote(content)
-
-    # QR URL
-    qr_url = (
-        f"https://img.vietqr.io/image/"
-        f"{bank_id}-{account_no}-compact2.png"
-        f"?amount={int(order.total_price)}"
-        f"&addInfo={encoded_content}"
-        f"&accountName=NGUYEN%20NGOC"
-    )
-
-    return render(
-        request,
-        "shop/payment_qr.html",
-        {
-            "order": order,
-            "qr_url": qr_url
-        }
-    )
-
-
-# =========================
-# CHECK PAYMENT STATUS
-# =========================
-def check_payment(request, order_code):
-
-    order = get_object_or_404(
-        Order,
-        order_code=order_code
-    )
-
-    return JsonResponse({
-        "status": order.status
-    })
-
-
-# =========================
-# CONFIRM PAYMENT MANUAL
-# =========================
-def confirm_payment(request, order_id):
-
-    order = get_object_or_404(
-        Order,
-        id=order_id
-    )
-
-    # tránh confirm nhiều lần
-    if order.status == "CONFIRMED":
-        return redirect(
-            'order_success',
-            order_code=order.order_code
-        )
-
-    # chỉ BANKING
-    if order.payment_method == "BANKING":
-
-        order.status = "CONFIRMED"
-
-        order.save()
-
-    return redirect(
-        'order_success',
-        order_code=order.order_code
-    )
-
-
-# =========================
-# VERIFY SEPAY SIGNATURE
-# =========================
-def verify_sepay_signature(raw_body, signature):
-
-    # nếu chưa cấu hình secret
-    if not hasattr(settings, "SEPAY_SECRET"):
-        return False
-
-    secret = settings.SEPAY_SECRET.encode()
-
-    computed_signature = hmac.new(
-        secret,
-        raw_body,
-        hashlib.sha256
-    ).hexdigest()
-
-    return hmac.compare_digest(
-        computed_signature,
-        signature or ""
-    )
-
-
-# =========================
-# PAYMENT WEBHOOK
-# =========================
 @csrf_exempt
 def payment_webhook(request):
 
     print("🔥 WEBHOOK CALLED")
 
+    #
+    # luôn trả success true cho SePay
+    #
     if request.method != "POST":
-        return JsonResponse(
-            {"success": False},
-            status=400
-        )
+        return JsonResponse({"success": True})
 
     try:
         data = json.loads(request.body)
 
-        print("DATA:", data)
+        print("📦 DATA:", data)
 
     except Exception as e:
 
-        print("JSON ERROR:", e)
+        print("❌ JSON ERROR:", e)
 
-        return JsonResponse(
-            {"success": False},
-            status=400
-        )
+        return JsonResponse({"success": True})
 
     #
-    # SEPAY DATA
+    # lấy dữ liệu
     #
     content = data.get("content", "")
 
     amount = int(data.get("transferAmount", 0))
 
+    transaction_id = data.get("id")
+
+    print("💳 CONTENT:", content)
+    print("💰 AMOUNT:", amount)
+    print("🆔 TRANSACTION:", transaction_id)
+
+    #
+    # content rỗng
+    #
+    if not content:
+
+        print("❌ EMPTY CONTENT")
+
+        return JsonResponse({"success": True})
+
     #
     # lấy order code
     #
-    order_code = content.split()[0]
+    try:
+        order_code = content.split()[0]
 
-    print("ORDER CODE:", order_code)
+    except Exception as e:
+
+        print("❌ ORDER CODE ERROR:", e)
+
+        return JsonResponse({"success": True})
+
+    print("📌 ORDER CODE:", order_code)
 
     #
     # tìm order
@@ -1340,9 +1233,7 @@ def payment_webhook(request):
 
         print("❌ ORDER NOT FOUND")
 
-        return JsonResponse({
-            "success": True
-        })
+        return JsonResponse({"success": True})
 
     #
     # check amount
@@ -1351,23 +1242,19 @@ def payment_webhook(request):
 
         print("❌ WRONG AMOUNT")
 
-        return JsonResponse({
-            "success": True
-        })
+        return JsonResponse({"success": True})
 
     #
-    # already confirmed
+    # tránh confirm nhiều lần
     #
     if order.status == "CONFIRMED":
 
         print("⚠️ ALREADY CONFIRMED")
 
-        return JsonResponse({
-            "success": True
-        })
+        return JsonResponse({"success": True})
 
     #
-    # confirm
+    # confirm order
     #
     order.status = "CONFIRMED"
 
@@ -1375,6 +1262,4 @@ def payment_webhook(request):
 
     print("✅ PAYMENT SUCCESS")
 
-    return JsonResponse({
-        "success": True
-    })
+    return JsonResponse({"success": True})
