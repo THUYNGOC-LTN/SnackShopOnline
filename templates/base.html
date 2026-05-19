@@ -18,15 +18,6 @@
   </head>
 
   <body>
-    <!-- LOADING PAGE -->
-    <div id="loading-page">
-      <div class="loader-container">
-        <div class="loader-spinner"></div>
-        <p class="loader-text">SnackShop</p>
-        <p class="loader-subtext">Thiên đường đồ ăn vặt...</p>
-      </div>
-    </div>
-
     <!-- NAVBAR LUÔN HIỆN -->
     {% include 'navbar.html' %}
 
@@ -46,17 +37,7 @@
 
     <!-- LOADING PAGE SCRIPT -->
     <script>
-      // Hide loading page when DOM is ready
-      document.addEventListener("DOMContentLoaded", function () {
-        const loadingPage = document.getElementById("loading-page");
-        if (loadingPage) {
-          setTimeout(function () {
-            loadingPage.classList.add("hidden");
-          }, 500);
-        }
-      });
-
-      // Show loading page on page navigation
+      // Show navbar loader on page navigation
       document.addEventListener("click", function (e) {
         const target = e.target.closest("a");
         if (
@@ -65,16 +46,18 @@
           !target.target &&
           !target.classList.contains("add-to-cart-btn") &&
           !target.classList.contains("qty-btn") &&
-          !target.classList.contains("remove-item-btn")
+          !target.classList.contains("remove-item-btn") &&
+          !target.classList.contains("user_dropdown_btn") &&
+          !target.classList.contains("dropdown_menu")
         ) {
           const href = target.getAttribute("href");
           if (
             href.startsWith("http") === false ||
             href.includes(window.location.hostname)
           ) {
-            const loadingPage = document.getElementById("loading-page");
-            if (loadingPage) {
-              loadingPage.classList.remove("hidden");
+            const navbarLoader = document.getElementById("navbar-loader");
+            if (navbarLoader) {
+              navbarLoader.classList.add("active");
             }
           }
         }

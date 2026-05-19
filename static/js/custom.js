@@ -57,16 +57,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Cart quantity adjustment (increase/decrease)
+  // Cart quantity adjustment (increase/decrease) - Optimize UX
   const qtyButtons = document.querySelectorAll(".qty-btn");
 
   qtyButtons.forEach((button) => {
     button.addEventListener("click", async function () {
       const url = this.getAttribute("data-url");
-      const originalText = this.innerText;
 
-      // Disable button
+      // Disable button smoothly without showing loading text
       this.disabled = true;
+      this.style.opacity = "0.6";
 
       try {
         const response = await fetch(url, {
@@ -117,22 +117,25 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           this.disabled = false;
+          this.style.opacity = "1";
         } else {
           alert(
             "❌ Có lỗi xảy ra: " +
               (data.message || "Không thể cập nhật số lượng"),
           );
           this.disabled = false;
+          this.style.opacity = "1";
         }
       } catch (error) {
         console.error("Error:", error);
         alert("❌ Có lỗi xảy ra");
         this.disabled = false;
+        this.style.opacity = "1";
       }
     });
   });
 
-  // Remove item from cart
+  // Remove item from cart - Optimized UX
   const removeButtons = document.querySelectorAll(".remove-item-btn");
 
   removeButtons.forEach((button) => {
@@ -143,8 +146,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Disable button
+      // Disable button with visual feedback
       this.disabled = true;
+      this.style.opacity = "0.6";
 
       try {
         const response = await fetch(url, {
@@ -197,11 +201,13 @@ document.addEventListener("DOMContentLoaded", function () {
             "❌ Có lỗi xảy ra: " + (data.message || "Không thể xóa sản phẩm"),
           );
           this.disabled = false;
+          this.style.opacity = "1";
         }
       } catch (error) {
         console.error("Error:", error);
         alert("❌ Có lỗi xảy ra");
         this.disabled = false;
+        this.style.opacity = "1";
       }
     });
   });
