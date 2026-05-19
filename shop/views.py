@@ -1191,8 +1191,8 @@ def payment_qr(request, order_code):
     # =========================
     # BANK INFO
     # =========================
-    bank_id = "TPBANK"
-    account_no = "38788393939"
+    bank_id = "MBBANK"
+    account_no = "0903187603"
 
     # nội dung CK
     content = order.order_code
@@ -1205,7 +1205,7 @@ def payment_qr(request, order_code):
         f"{bank_id}-{account_no}-compact2.png"
         f"?amount={int(order.total_price)}"
         f"&addInfo={encoded_content}"
-        f"&accountName=NGUYEN%20NGOC"
+        f"&accountName=THUY%20NGOC"
     )
 
     return render(
