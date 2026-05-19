@@ -1160,6 +1160,103 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Order
 
+# =========================
+# PAYMENT QR
+# =========================
+def payment_qr(request, order_code):
+
+    order = get_object_or_404(
+        Order,
+        order_code=order_code
+    )
+
+    # chỉ BANKING mới được vào
+    if order.payment_method != "BANKING":
+        return redirect(
+            'order_success',
+            order_code=order.order_code
+        )
+
+    # nếu đã thanh toán rồi
+    if order.status == "CONFIRMED":
+        return redirect(
+            'order_success',
+            order_code=order.order_code
+        )
+
+    # nếu đã huỷ
+    if order.status == "CANCELLED":
+        return redirect('orders')
+
+    # =========================
+    # BANK INFO
+    # =========================
+    bank_id = "TPBANK"
+    account_no = "38788393939"
+
+    # nội dung CK
+    content = order.order_code
+
+    encoded_content = urllib.parse.quote(content)
+
+    # QR URL
+    qr_url = (
+        f"https://img.vietqr.io/image/"
+        f"{bank_id}-{account_no}-compact2.png"
+        f"?amount={int(order.total_price)}"
+        f"&addInfo={encoded_content}"
+        f"&accountName=NGUYEN%20NGOC"
+    )
+
+    return render(
+        request,
+        "shop/payment_qr.html",
+        {
+            "order": order,
+            "qr_url": qr_url
+        }
+    )
+
+
+# =========================
+# CHECK PAYMENT STATUS
+# =========================
+def check_payment(request, order_code):
+
+    order = get_object_or_404(
+        Order,
+        order_code=order_code
+    )
+
+    return JsonResponse({
+        "status": order.status
+    })
+
+
+
+
+# =========================
+# VERIFY SEPAY SIGNATURE
+# =========================
+def verify_sepay_signature(raw_body, signature):
+
+    # nếu chưa cấu hình secret
+    if not hasattr(settings, "SEPAY_SECRET"):
+        return False
+
+    secret = settings.SEPAY_SECRET.encode()
+
+    computed_signature = hmac.new(
+        secret,
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(
+        computed_signature,
+        signature or ""
+    )
+
 
 # =========================
 # PAYMENT QR
