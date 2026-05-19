@@ -49,38 +49,174 @@
         <img
           src="{% static 'images/logo1.gif' %}"
           class="snackshop_logo"
-          style="max-width: 300px"
+          style="
+            max-width: 380px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+          "
         />
       </div>
 
       <div class="col-lg-7" style="padding: 30px">
         <div class="about_content">
-          <h2>✨ SNACKSHOP</h2>
-          <div class="about_line"></div>
+          <h2
+            style="
+              font-size: 2.8rem;
+              font-weight: 800;
+              color: #222831;
+              margin-bottom: 15px;
+            "
+          >
+            ✨ SNACKSHOP
+          </h2>
+          <div
+            class="about_line"
+            style="
+              height: 5px;
+              background: linear-gradient(90deg, #ffbe33 0%, #e69c00 100%);
+              margin-bottom: 25px;
+            "
+          ></div>
 
-          <p>
-            SnackShop là cửa hàng chuyên cung cấp đồ ăn vặt chất lượng cao, từ
-            các loại bánh kẹo, bim bim cho đến các sản phẩm nhập khẩu từ khắp
-            nơi trên thế giới.
+          <div
+            style="
+              background: linear-gradient(135deg, #fff9e6 0%, #fffaed 100%);
+              padding: 20px;
+              border-radius: 12px;
+              border-left: 5px solid #ffbe33;
+              margin-bottom: 20px;
+            "
+          >
+            <p
+              style="
+                font-size: 16px;
+                line-height: 1.8;
+                color: #333;
+                margin: 0;
+                font-weight: 500;
+              "
+            >
+              🎯 <strong>Cửa hàng chuyên cung cấp</strong> đồ ăn vặt chất lượng
+              cao, từ các loại bánh kẹo, bim bim cho đến các sản phẩm nhập khẩu
+              từ khắp nơi trên thế giới.
+            </p>
+          </div>
+
+          <div
+            style="
+              display: flex;
+              gap: 15px;
+              margin-bottom: 25px;
+              flex-wrap: wrap;
+            "
+          >
+            <div style="flex: 1; min-width: 150px">
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13px;
+                  color: #666;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                ✅ Chất Lượng
+              </p>
+              <p
+                style="
+                  margin: 5px 0 0 0;
+                  font-size: 15px;
+                  font-weight: 600;
+                  color: #222831;
+                "
+              >
+                100% Chính Hãng
+              </p>
+            </div>
+            <div style="flex: 1; min-width: 150px">
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13px;
+                  color: #666;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                🚚 Giao Hàng
+              </p>
+              <p
+                style="
+                  margin: 5px 0 0 0;
+                  font-size: 15px;
+                  font-weight: 600;
+                  color: #222831;
+                "
+              >
+                Nhanh & Gọn
+              </p>
+            </div>
+            <div style="flex: 1; min-width: 150px">
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13px;
+                  color: #666;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                💰 Giá
+              </p>
+              <p
+                style="
+                  margin: 5px 0 0 0;
+                  font-size: 15px;
+                  font-weight: 600;
+                  color: #222831;
+                "
+              >
+                Cạnh Tranh Nhất
+              </p>
+            </div>
+          </div>
+
+          <p
+            style="
+              font-size: 15px;
+              line-height: 1.7;
+              color: #555;
+              margin-bottom: 20px;
+            "
+          >
+            💡 Chúng tôi cam kết cung cấp sản phẩm tươi mới, an toàn và với giá
+            cạnh tranh nhất trên thị trường.
           </p>
-          <p>
-            Chúng tôi cam kết cung cấp sản phẩm tươi mới, an toàn và với giá
-            cạnh tranh nhất.
-          </p>
+
           <a
             href="{% url 'all_products' %}"
             style="
               display: inline-block;
-              padding: 10px 40px;
-              background-color: #ffbe33;
+              padding: 14px 50px;
+              background: linear-gradient(135deg, #ffbe33 0%, #ffa500 100%);
               color: #fff;
               border-radius: 30px;
               text-decoration: none;
-              font-weight: 600;
-              transition: all 0.3s;
-              margin-top: 15px;
+              font-weight: 700;
+              font-size: 16px;
+              transition: all 0.35s ease;
+              box-shadow: 0 6px 15px rgba(255, 190, 51, 0.3);
+              border: 2px solid transparent;
             "
-            >Mua ngay →</a
+            onmouseover="
+              this.style.transform = 'translateY(-3px)';
+              this.style.boxShadow = '0 10px 25px rgba(255, 190, 51, 0.4)';
+            "
+            onmouseout="
+              this.style.transform = 'translateY(0)';
+              this.style.boxShadow = '0 6px 15px rgba(255, 190, 51, 0.3)';
+            "
+            >🛒 Mua ngay →</a
           >
         </div>
       </div>

@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% load static %} {% load custom_filters %}   
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block
+content %}
 
 <section class="products_page">
   <div class="container py-5">
@@ -88,9 +88,13 @@
                   </a>
 
                   {% if user.is_authenticated %}
-                  <a href="{% url 'add_to_cart' p.id %}" class="cart_btn">
+                  <button
+                    type="button"
+                    class="add-to-cart-btn cart_btn"
+                    data-url="{% url 'add_to_cart' p.id %}"
+                  >
                     🛒
-                  </a>
+                  </button>
                   {% endif %}
                 </div>
               </div>
