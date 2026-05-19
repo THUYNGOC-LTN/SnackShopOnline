@@ -7,6 +7,24 @@ function getYear() {
 
 getYear();
 
+// Get CSRF token from cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+const csrftoken = getCookie("csrftoken");
+
 // Add to cart functionality with loading indicator
 document.addEventListener("DOMContentLoaded", function () {
   const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
@@ -21,11 +39,16 @@ document.addEventListener("DOMContentLoaded", function () {
       this.innerText = "⏳ Đang thêm...";
 
       try {
+        const headers = {
+          "X-Requested-With": "XMLHttpRequest",
+        };
+        if (csrftoken) {
+          headers["X-CSRFToken"] = csrftoken;
+        }
+
         const response = await fetch(url, {
           method: "GET",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
+          headers: headers,
         });
 
         const data = await response.json();
@@ -69,11 +92,16 @@ document.addEventListener("DOMContentLoaded", function () {
       this.style.opacity = "0.6";
 
       try {
+        const headers = {
+          "X-Requested-With": "XMLHttpRequest",
+        };
+        if (csrftoken) {
+          headers["X-CSRFToken"] = csrftoken;
+        }
+
         const response = await fetch(url, {
           method: "GET",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
+          headers: headers,
         });
 
         const data = await response.json();
@@ -151,11 +179,16 @@ document.addEventListener("DOMContentLoaded", function () {
       this.style.opacity = "0.6";
 
       try {
+        const headers = {
+          "X-Requested-With": "XMLHttpRequest",
+        };
+        if (csrftoken) {
+          headers["X-CSRFToken"] = csrftoken;
+        }
+
         const response = await fetch(url, {
           method: "GET",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
+          headers: headers,
         });
 
         const data = await response.json();
