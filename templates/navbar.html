@@ -1,11 +1,11 @@
 {% load static %}
 
 <header class="header_section">
-  <div class="container-fluid">
+  <div class="container-fluid" style="padding: 0 10px">
     <nav class="navbar navbar-expand-lg custom_nav-container navbar-dark">
       <!-- LOGO -->
       <a class="navbar-brand" href="{% url 'home' %}">
-        <span> SnackShop</span>
+        <span>SnackShop</span>
       </a>
 
       <!-- MOBILE BUTTON -->
@@ -31,12 +31,12 @@
         <ul class="navbar-nav mx-auto">
           <!-- HOME -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'home' %}"> Trang chủ </a>
+            <a class="nav-link" href="{% url 'home' %}">Trang chủ</a>
           </li>
 
           <!-- BLOG -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'blog_list' %}"> Blog </a>
+            <a class="nav-link" href="{% url 'blog_list' %}">Blog</a>
           </li>
 
           {% if user.is_authenticated %}
@@ -59,11 +59,11 @@
           <!-- ========================= -->
 
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'all_products' %}"> Menu </a>
+            <a class="nav-link" href="{% url 'all_products' %}">Menu</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'orders' %}"> Đơn hàng </a>
+            <a class="nav-link" href="{% url 'orders' %}">Đơn hàng</a>
           </li>
 
           {% endif %} {% endif %}
@@ -81,24 +81,24 @@
               <div class="navbar_avatar">
                 {% if user.profile.avatar %}
                 <img src="{{ user.profile.avatar.url }}" alt="Avatar" />
-                {% else %} 👤 {% endif %}
+                {% else %}👤{% endif %}
               </div>
-              {{ user.last_name }}
+              <span>{{ user.last_name }}</span>
             </span>
             <div class="dropdown_menu">
-              <a href="{% url 'profile' %}"> Hồ sơ</a>
-              <a href="{% url 'edit_profile' %}"> Chỉnh sửa hồ sơ</a>
-              <a href="{% url 'logout' %}"> Đăng xuất</a>
+              <a href="{% url 'profile' %}">Hồ sơ</a>
+              <a href="{% url 'edit_profile' %}">Chỉnh sửa hồ sơ</a>
+              <a href="{% url 'logout' %}">Đăng xuất</a>
             </div>
           </div>
 
           {% else %}
 
           <!-- LOGIN -->
-          <a href="{% url 'login' %}" class="order_online"> Đăng nhập </a>
+          <a href="{% url 'login' %}" class="order_online">Đăng nhập</a>
 
           <!-- REGISTER -->
-          <a href="{% url 'register' %}" class="order_online"> Đăng ký </a>
+          <a href="{% url 'register' %}" class="order_online">Đăng ký</a>
 
           {% endif %}
 
@@ -109,7 +109,7 @@
 
           <a class="cart_link" href="{% url 'cart' %}" title="Xem giỏ hàng">
             🛒 {% if cart_count > 0 %}
-            <span class="badge"> {{ cart_count }} </span>
+            <span class="badge">{{ cart_count }}</span>
             {% endif %}
           </a>
 

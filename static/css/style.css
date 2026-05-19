@@ -332,6 +332,7 @@ a:focus {
   height: 42px;
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
+  z-index: 10001;
 }
 
 .custom_nav-container .navbar-toggler span {
