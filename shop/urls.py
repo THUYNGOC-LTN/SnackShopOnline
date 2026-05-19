@@ -18,7 +18,7 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('product/<int:product_id>/', views.product_detail, name='product_detail'),
     path('review/<int:product_id>/', views.add_review, name='add_review'),
-    path('confirm-payment/<int:order_id>/', views.confirm_payment, name='confirm_payment'), 
+    
     path('cancel-order/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('delete-product/<int:id>/', views.delete_product, name='delete_product'),
     path('delete-order/<int:id>/', views.delete_order, name='delete_order'),
