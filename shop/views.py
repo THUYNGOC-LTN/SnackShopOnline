@@ -1293,135 +1293,88 @@ def verify_sepay_signature(raw_body, signature):
 @csrf_exempt
 def payment_webhook(request):
 
+    print("🔥 WEBHOOK CALLED")
+
     if request.method != "POST":
         return JsonResponse(
-            {"error": "invalid method"},
+            {"success": False},
             status=400
         )
 
-    # =========================
-    # RAW DATA
-    # =========================
-    raw_body = request.body
-
-    signature = request.headers.get(
-        "X-SePay-Signature"
-    )
-
-    # =========================
-    # VERIFY SIGNATURE
-    # =========================
-    if not verify_sepay_signature(
-        raw_body,
-        signature
-    ):
-        return JsonResponse(
-            {"error": "invalid signature"},
-            status=403
-        )
-
-    # =========================
-    # PARSE JSON
-    # =========================
     try:
+        data = json.loads(request.body)
 
-        data = json.loads(raw_body)
+        print("DATA:", data)
 
-    except Exception:
+    except Exception as e:
+
+        print("JSON ERROR:", e)
 
         return JsonResponse(
-            {"error": "invalid json"},
+            {"success": False},
             status=400
         )
 
-    """
-    DATA EXAMPLE:
+    #
+    # SEPAY DATA
+    #
+    content = data.get("content", "")
 
-    {
-        "content": "OD01429E5C",
-        "amount": 18000
-    }
-    """
+    amount = int(data.get("transferAmount", 0))
 
-    # =========================
-    # GET DATA
-    # =========================
-    order_code = str(
-        data.get("content", "")
-    ).strip()
+    #
+    # lấy order code
+    #
+    order_code = content.split()[0]
 
-    amount = int(
-        data.get("amount", 0)
-    )
+    print("ORDER CODE:", order_code)
 
-    # =========================
-    # VALIDATE
-    # =========================
-    if not order_code:
-
-        return JsonResponse(
-            {"error": "missing order_code"},
-            status=400
-        )
-
-    # =========================
-    # FIND ORDER
-    # =========================
+    #
+    # tìm order
+    #
     order = Order.objects.filter(
         order_code=order_code
     ).first()
 
     if not order:
 
-        return JsonResponse(
-            {"error": "order not found"},
-            status=404
-        )
-
-    # =========================
-    # CHECK AMOUNT
-    # =========================
-    if int(order.total_price) != amount:
-
-        return JsonResponse(
-            {"error": "invalid amount"},
-            status=400
-        )
-
-    # =========================
-    # IDEMPOTENT
-    # =========================
-    if order.status == "CONFIRMED":
+        print("❌ ORDER NOT FOUND")
 
         return JsonResponse({
-            "message": "already confirmed"
+            "success": True
         })
 
-    if order.status == "CANCELLED":
+    #
+    # check amount
+    #
+    if int(order.total_price) != amount:
 
-        return JsonResponse(
-            {"error": "order cancelled"},
-            status=400
-        )
+        print("❌ WRONG AMOUNT")
 
-    # =========================
-    # UPDATE STATUS
-    # =========================
-    updated = Order.objects.filter(
-        order_code=order_code,
-        status="PENDING"
-    ).update(
-        status="CONFIRMED"
-    )
+        return JsonResponse({
+            "success": True
+        })
 
-    # update fail
-    if updated == 0:
+    #
+    # already confirmed
+    #
+    if order.status == "CONFIRMED":
 
-        return JsonResponse(
-            {"error": "update failed"},
-            status=400
-        )
+        print("⚠️ ALREADY CONFIRMED")
+
+        return JsonResponse({
+            "success": True
+        })
+
+    #
+    # confirm
+    #
+    order.status = "CONFIRMED"
+
+    order.save()
+
+    print("✅ PAYMENT SUCCESS")
 
     return JsonResponse({
-        "message": "success"
+        "success": True
     })
