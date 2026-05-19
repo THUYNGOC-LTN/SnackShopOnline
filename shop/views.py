@@ -1265,13 +1265,32 @@ def verify_sepay_signature(raw_body, signature):
 def payment_webhook(request):
 
     print("🔥 WEBHOOK CALLED")
+    print("METHOD:", request.method)
 
     #
-    # luôn trả success true cho SePay
+    # TEST GET
     #
-    if request.method != "POST":
+    if request.method == "GET":
+
+        order_code = request.GET.get("order_code")
+
+        print("📌 GET ORDER:", order_code)
+
+        order = Order.objects.filter(
+            order_code=order_code
+        ).first()
+
+        if order:
+            order.status = "CONFIRMED"
+            order.save()
+
+            print("✅ PAYMENT SUCCESS (GET)")
+
         return JsonResponse({"success": True})
 
+    #
+    # POST từ SePay
+    #
     try:
         data = json.loads(request.body)
 
@@ -1283,78 +1302,26 @@ def payment_webhook(request):
 
         return JsonResponse({"success": True})
 
-    #
-    # lấy dữ liệu
-    #
     content = data.get("content", "")
-
     amount = int(data.get("transferAmount", 0))
 
-    transaction_id = data.get("id")
-
-    print("💳 CONTENT:", content)
-    print("💰 AMOUNT:", amount)
-    print("🆔 TRANSACTION:", transaction_id)
-
-    #
-    # content rỗng
-    #
-    if not content:
-
-        print("❌ EMPTY CONTENT")
-
-        return JsonResponse({"success": True})
-
-    #
-    # lấy order code
-    #
     try:
         order_code = content.split()[0]
 
-    except Exception as e:
-
-        print("❌ ORDER CODE ERROR:", e)
-
+    except:
         return JsonResponse({"success": True})
 
-    print("📌 ORDER CODE:", order_code)
-
-    #
-    # tìm order
-    #
     order = Order.objects.filter(
         order_code=order_code
     ).first()
 
     if not order:
-
-        print("❌ ORDER NOT FOUND")
-
         return JsonResponse({"success": True})
 
-    #
-    # check amount
-    #
     if int(order.total_price) != amount:
-
-        print("❌ WRONG AMOUNT")
-
         return JsonResponse({"success": True})
 
-    #
-    # tránh confirm nhiều lần
-    #
-    if order.status == "CONFIRMED":
-
-        print("⚠️ ALREADY CONFIRMED")
-
-        return JsonResponse({"success": True})
-
-    #
-    # confirm order
-    #
     order.status = "CONFIRMED"
-
     order.save()
 
     print("✅ PAYMENT SUCCESS")
