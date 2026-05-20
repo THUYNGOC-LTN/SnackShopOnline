@@ -150,7 +150,7 @@ document.querySelectorAll(".qty-btn").forEach((button) => {
 
             if (data.success) {
 
-                // Nếu quantity = 0 => xóa card
+                // quantity = 0 => remove card
                 if (data.quantity === 0) {
 
                     cartCard.style.transition = "0.3s";
@@ -167,16 +167,14 @@ document.querySelectorAll(".qty-btn").forEach((button) => {
 
                 } else {
 
-                    // Update quantity
-                    cartCard.querySelector("input").value =
-                        data.quantity;
+                    // update quantity
+                    cartCard.querySelector("input").value = data.quantity;
 
-                    // Update subtotal
+                    // update subtotal
                     cartCard.querySelector(".cart_total_price").innerText =
-                        new Intl.NumberFormat("vi-VN").format(data.item_total)
-                        + " VND";
+                        new Intl.NumberFormat("vi-VN").format(data.item_total) + " VND";
 
-                    // Update quantity x price
+                    // update qty text
                     const price =
                         cartCard.querySelector(".price").innerText;
 
@@ -184,10 +182,10 @@ document.querySelectorAll(".qty-btn").forEach((button) => {
                         data.quantity + " x " + price;
                 }
 
-                // Update tổng tiền
+                // update total
                 updateCartTotal(data.cart_total);
 
-                // Update số lượng navbar
+                // update navbar badge
                 updateNavbarCount(data.cart_count);
             }
 
