@@ -163,11 +163,9 @@ def add_to_cart(request, product_id):
         item.quantity += 1
         item.save()
 
-    # Calculate total quantity (not just item count)
-    cart_count = sum(
-        item.quantity
-        for item in CartItem.objects.filter(cart=cart)
-    )
+    cart_count = CartItem.objects.filter(
+        cart=cart
+    ).count()
 
     return JsonResponse({
         'success': True,
@@ -214,6 +212,10 @@ def update_quantity(request, item_id):
 
     return redirect('cart')
 
+
+# =========================
+# REMOVE ITEM
+# =========================
 # =========================
 # REMOVE ITEM
 # =========================
@@ -242,7 +244,7 @@ def remove_from_cart(request, item_id):
 
     return JsonResponse({
         "success": True,
-        "cart_total": float(cart_total),
+        "cart_total": float(total),
         "cart_count": cart_count
     })
 
@@ -1013,6 +1015,9 @@ def edit_product(request, id):
 # =========================
 # INCREASE CART QUANTITY
 # =========================
+# =========================
+# INCREASE CART QUANTITY
+# =========================
 @login_required
 def increase_cart(request, item_id):
 
@@ -1025,7 +1030,6 @@ def increase_cart(request, item_id):
     item.quantity += 1
 
     item.save()
-    cart=item.cart
 
     # tổng item
     item_total = (
@@ -1051,7 +1055,7 @@ def increase_cart(request, item_id):
 
         'quantity': item.quantity,
 
-        'item_total': float(item.product.price * item.quantity),
+        'item_total': float(item_total),
 
         'cart_total': float(cart_total),
 
@@ -1084,6 +1088,8 @@ def decrease_cart(request, item_id):
             item.quantity
         )
 
+        deleted = False
+
     else:
 
         item.delete()
@@ -1108,7 +1114,9 @@ def decrease_cart(request, item_id):
 
         'success': True,
 
-        'quantity': quantity,
+        'deleted': deleted,
+
+        'quantity': item.quantity if not deleted else 0,
 
         'item_total': float(item_total),
 
