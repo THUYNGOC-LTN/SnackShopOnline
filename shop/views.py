@@ -163,11 +163,9 @@ def add_to_cart(request, product_id):
         item.quantity += 1
         item.save()
 
-    # Calculate total quantity (sum all quantities, not just count items)
-    cart_count = sum(
-        item.quantity
-        for item in CartItem.objects.filter(cart=cart)
-    )
+    cart_count = CartItem.objects.filter(
+        cart=cart
+    ).count()
 
     return JsonResponse({
         'success': True,
@@ -506,11 +504,13 @@ def delete_blog(request, blog_id):
 # =========================
 # ORDER SUCCESS
 # =========================
+@login_required
 def order_success(request, order_code):
 
     order = get_object_or_404(
         Order,
-        order_code=order_code
+        order_code=order_code,
+        user=request.user
     )
 
     # BANKING chưa thanh toán
