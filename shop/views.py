@@ -163,9 +163,11 @@ def add_to_cart(request, product_id):
         item.quantity += 1
         item.save()
 
-    cart_count = CartItem.objects.filter(
-        cart=cart
-    ).count()
+    # Calculate total quantity (sum all quantities, not just count items)
+    cart_count = sum(
+        item.quantity
+        for item in CartItem.objects.filter(cart=cart)
+    )
 
     return JsonResponse({
         'success': True,
