@@ -262,10 +262,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 updateCartCount(data.cart_count);
               }
 
-              // Check if cart is empty
+              // Show empty cart message if all items removed
               const remainingCards = document.querySelectorAll(".cart_card");
               if (remainingCards.length === 0) {
-                location.reload();
+                // Show empty cart message instead of reloading
+                const cartSection = document.querySelector(".cart_section");
+                if (cartSection) {
+                  cartSection.innerHTML = `
+                    <div class="container">
+                      <div class="empty_cart" style="text-align: center; padding: 60px 20px;">
+                        <h3>🛒 Giỏ hàng của bạn trống</h3>
+                        <p style="color: #666; font-size: 16px; margin: 15px 0;">Hãy thêm sản phẩm để tiếp tục mua sắm</p>
+                        <a href="/" style="display: inline-block; padding: 12px 30px; background: #ffbe33; color: #fff; border-radius: 25px; text-decoration: none; font-weight: 600;">← Quay lại trang chủ</a>
+                      </div>
+                    </div>
+                  `;
+                }
               }
             }, 300);
           }

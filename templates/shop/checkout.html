@@ -1,348 +1,211 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block
+content %}
 
 <section class="checkout_section">
-
-<div class="container">
-
+  <div class="container">
     <!-- TITLE -->
-    <h2 class="checkout_title">
-      📋 Xác nhận đơn hàng
-    </h2>
+    <h2 class="checkout_title">📋 Xác nhận đơn hàng</h2>
 
     <div class="row g-4">
+      <!-- LEFT -->
+      <div class="col-lg-7">
+        <div class="checkout_box">
+          <h5>🍟 Sản phẩm trong đơn hàng</h5>
 
-        <!-- LEFT -->
-        <div class="col-lg-7">
+          {% for item in items %}
 
-            <div class="checkout_box">
+          <div class="product_item">
+            <div>
+              <div class="product_name">{{ item.product.name }}</div>
 
-                <h5>
-                    🍟 Sản phẩm trong đơn hàng
-                </h5>
-
-                {% for item in items %}
-
-                <div class="product_item">
-
-                    <div>
-
-                        <div class="product_name">
-                            {{ item.product.name }}
-                        </div>
-
-                        <div class="product_qty">
-                            Số lượng:
-                            {{ item.quantity }}
-                            x
-                            {{ item.product.price|vnd }}
-                        </div>
-
-                    </div>
-
-                    <div class="product_price">
-                        {{ item.get_total|vnd }}
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-                <!-- SHIPPING -->
-                <div class="summary_row">
-
-                    <span>
-                        🚚 Phí vận chuyển
-                    </span>
-
-                    <span style="
-                        color: #27ae60;
-                        font-weight: 800;
-                    ">
-                        Miễn phí
-                    </span>
-
-                </div>
-
-                <!-- TOTAL -->
-                <div class="total_box">
-
-                    <h4>
-                        Tổng cộng
-                    </h4>
-
-                    <div class="total_price">
-                        {{ total|vnd }} VND
-                    </div>
-
-                </div>
-
+              <div class="product_qty">
+                Số lượng: {{ item.quantity }} x {{ item.product.price|vnd }}
+              </div>
             </div>
 
+            <div class="product_price">{{ item.get_total|vnd }}</div>
+          </div>
+
+          {% endfor %}
+
+          <!-- SHIPPING -->
+          <div class="summary_row">
+            <span> 🚚 Phí vận chuyển </span>
+
+            <span style="color: #27ae60; font-weight: 800"> Miễn phí </span>
+          </div>
+
+          <!-- TOTAL -->
+          <div class="total_box">
+            <h4>Tổng cộng</h4>
+
+            <div class="total_price">{{ total|vnd }}</div>
+          </div>
         </div>
+      </div>
 
-        <!-- RIGHT -->
-        <div class="col-lg-5">
+      <!-- RIGHT -->
+      <div class="col-lg-5">
+        <div class="checkout_box">
+          <!-- FORM -->
+          <form method="POST" id="checkoutForm">
+            {% csrf_token %}
 
-            <div class="checkout_box">
+            <!-- INFO -->
+            <h5>📍 Thông tin nhận hàng</h5>
 
-                <!-- FORM -->
-                <form
-                    method="POST"
-                    id="checkoutForm"
-                >
+            <!-- FULLNAME -->
+            <label class="form_input_label"> 👤 Họ và tên </label>
 
-                    {% csrf_token %}
+            <input
+              type="text"
+              name="fullname"
+              placeholder="Nhập họ và tên đầy đủ"
+              class="form_input"
+              required
+            />
 
-                    <!-- INFO -->
-                    <h5>
-                        📍 Thông tin nhận hàng
-                    </h5>
+            <!-- PHONE -->
+            <label class="form_input_label"> 📞 Số điện thoại </label>
 
-                    <!-- FULLNAME -->
-                    <label class="form_input_label">
-                        👤 Họ và tên
-                    </label>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Nhập số điện thoại"
+              class="form_input"
+              required
+            />
 
-                    <input
-                        type="text"
-                        name="fullname"
-                        placeholder="Nhập họ và tên đầy đủ"
-                        class="form_input"
-                        required
-                    >
+            <!-- ADDRESS -->
+            <label class="form_input_label"> 📮 Địa chỉ giao hàng </label>
 
-                    <!-- PHONE -->
-                    <label class="form_input_label">
-                        📞 Số điện thoại
-                    </label>
+            <textarea
+              name="address"
+              placeholder="Nhập địa chỉ giao hàng chi tiết"
+              class="form_input"
+              required
+            ></textarea>
 
-                    <input
-                        type="text"
-                        name="phone"
-                        placeholder="Nhập số điện thoại"
-                        class="form_input"
-                        required
-                    >
+            <!-- PAYMENT -->
+            <h5 class="mt-4">💳 Phương thức thanh toán</h5>
 
-                    <!-- ADDRESS -->
-                    <label class="form_input_label">
-                        📮 Địa chỉ giao hàng
-                    </label>
+            <!-- COD -->
+            <div class="payment_box active">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  value="COD"
+                  id="cod"
+                  checked
+                />
 
-                    <textarea
-                        name="address"
-                        placeholder="Nhập địa chỉ giao hàng chi tiết"
-                        class="form_input"
-                        required
-                    ></textarea>
-
-                    <!-- PAYMENT -->
-                    <h5 class="mt-4">
-                        💳 Phương thức thanh toán
-                    </h5>
-
-                    <!-- COD -->
-                    <div class="payment_box active">
-
-                        <div class="form-check">
-
-                            <input
-                                class="form-check-input"
-                                type="radio"
-                                name="payment_method"
-                                value="COD"
-                                id="cod"
-                                checked
-                            >
-
-                            <label
-                                class="form-check-label"
-                                for="cod"
-                            >
-
-                                💵 Thanh toán khi nhận hàng (COD)
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <!-- BANKING -->
-                    <div class="payment_box">
-
-                        <div class="form-check">
-
-                            <input
-                                class="form-check-input"
-                                type="radio"
-                                name="payment_method"
-                                value="BANKING"
-                                id="bank"
-                            >
-
-                            <label
-                                class="form-check-label"
-                                for="bank"
-                            >
-
-                                🏦 Chuyển khoản ngân hàng
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <!-- INFO -->
-                    <div class="alert alert-info mt-4">
-
-                        <strong>
-                            ℹ️ Lưu ý:
-                        </strong>
-
-                        <br>
-
-                        Nếu chọn chuyển khoản ngân hàng,
-                        hệ thống sẽ chuyển sang
-                        trang quét mã QR tự động.
-
-                    </div>
-
-                    <!-- LOADING -->
-                    <div
-                        id="loadingBox"
-                        style="
-                            display:none;
-                            margin-top:15px;
-                            text-align:center;
-                            font-weight:600;
-                            color:#ffbe33;
-                        "
-                    >
-                        ⏳ Đang xử lý đơn hàng...
-                    </div>
-
-                    <!-- BUTTON -->
-                    <button
-                        type="submit"
-                        class="confirm_btn"
-                        id="checkoutBtn"
-                    >
-
-                        ✅ Xác nhận đặt hàng
-
-                    </button>
-
-                </form>
-
+                <label class="form-check-label" for="cod">
+                  💵 Thanh toán khi nhận hàng (COD)
+                </label>
+              </div>
             </div>
 
-        </div>
+            <!-- BANKING -->
+            <div class="payment_box">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  value="BANKING"
+                  id="bank"
+                />
 
+                <label class="form-check-label" for="bank">
+                  🏦 Chuyển khoản ngân hàng
+                </label>
+              </div>
+            </div>
+
+            <!-- INFO -->
+            <div class="alert alert-info mt-4">
+              <strong> ℹ️ Lưu ý: </strong>
+
+              <br />
+
+              Nếu chọn chuyển khoản ngân hàng, hệ thống sẽ chuyển sang trang
+              quét mã QR tự động.
+            </div>
+
+            <!-- LOADING -->
+            <div
+              id="loadingBox"
+              style="
+                display: none;
+                margin-top: 15px;
+                text-align: center;
+                font-weight: 600;
+                color: #ffbe33;
+              "
+            >
+              ⏳ Đang xử lý đơn hàng...
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit" class="confirm_btn" id="checkoutBtn">
+              ✅ Xác nhận đặt hàng
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
 
     <!-- BACK -->
     <div class="text-center mt-5">
-
-        <a
-            href="{% url 'cart' %}"
-            class="back_btn"
-        >
-
-            ← Quay lại giỏ hàng
-
-        </a>
-
+      <a href="{% url 'cart' %}" class="back_btn"> ← Quay lại giỏ hàng </a>
     </div>
-
-</div>
-
+  </div>
 </section>
 
 <script>
+  const checkoutForm = document.getElementById("checkoutForm");
 
-const checkoutForm =
-    document.getElementById(
-        "checkoutForm"
-    );
+  checkoutForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-checkoutForm.addEventListener(
-    "submit",
-    async function(e){
+    // UI loading
+    document.getElementById("checkoutBtn").disabled = true;
 
-        e.preventDefault();
+    document.getElementById("loadingBox").style.display = "block";
 
-        // UI loading
-        document.getElementById(
-            "checkoutBtn"
-        ).disabled = true;
+    const formData = new FormData(this);
 
-        document.getElementById(
-            "loadingBox"
-        ).style.display = "block";
+    try {
+      const response = await fetch("{% url 'checkout' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
 
-        const formData =
-            new FormData(this);
+      const data = await response.json();
 
-        try{
+      if (data.success) {
+        // redirect mượt
+        window.location.href = data.redirect_url;
+      } else {
+        alert(data.message);
 
-            const response = await fetch(
-                "{% url 'checkout' %}",
-                {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-Requested-With":
-                            "XMLHttpRequest"
-                    }
-                }
-            );
+        document.getElementById("checkoutBtn").disabled = false;
 
-            const data =
-                await response.json();
+        document.getElementById("loadingBox").style.display = "none";
+      }
+    } catch (error) {
+      alert("⚠️ Có lỗi xảy ra");
 
-            if(data.success){
+      document.getElementById("checkoutBtn").disabled = false;
 
-                // redirect mượt
-                window.location.href =
-                    data.redirect_url;
-
-            }else{
-
-                alert(data.message);
-
-                document.getElementById(
-                    "checkoutBtn"
-                ).disabled = false;
-
-                document.getElementById(
-                    "loadingBox"
-                ).style.display = "none";
-            }
-
-        }catch(error){
-
-            alert(
-                "⚠️ Có lỗi xảy ra"
-            );
-
-            document.getElementById(
-                "checkoutBtn"
-            ).disabled = false;
-
-            document.getElementById(
-                "loadingBox"
-            ).style.display = "none";
-        }
-
+      document.getElementById("loadingBox").style.display = "none";
     }
-);
-
+  });
 </script>
 
 {% endblock %}

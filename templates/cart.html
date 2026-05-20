@@ -1,275 +1,201 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block
+content %}
 
 <section class="cart_section">
+  <div class="container">
+    <h2 class="cart_title">🛒 Giỏ hàng của bạn</h2>
 
-<div class="container">
-
-<h2 class="cart_title">
-🛒 Giỏ hàng của bạn
-</h2>
-
-{% if items %}
-
-    {% for item in items %}
+    {% if items %} {% for item in items %}
 
     <div class="cart_card">
-
-        <!-- IMAGE -->
-        <div class="cart_img">
-            {% if item.product.image %}
-                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-            {% else %}
-                <div style="
-                    width:100%;
-                    height:100%;
-                    background:#f0f0f0;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                ">
-                    <span style="color:#999;">
-                        No Image
-                    </span>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- INFO -->
-        <div class="cart_info">
-            <h5>
-                {{ item.product.name }}
-            </h5>
-
-            <div class="price">
-                {{ item.product.price|vnd }} VND
-            </div>
-        </div>
-
-        <!-- QUANTITY -->
-        <div class="cart_qty">
-
-            <!-- MINUS -->
-            <button
-                type="button"
-                class="qty-btn"
-                data-url="{% url 'decrease_cart' item.id %}"
-            >
-                −
-            </button>
-
-            <!-- QTY -->
-            <input
-                type="number"
-                value="{{ item.quantity }}"
-                readonly
-            >
-
-            <!-- PLUS -->
-            <button
-                type="button"
-                class="qty-btn"
-                data-url="{% url 'increase_cart' item.id %}"
-            >
-                +
-            </button>
-
-        </div>
-
-        <!-- TOTAL -->
-        <div class="cart_total">
-
-            <div class="cart_total_qty">
-                {{ item.quantity }} x {{ item.product.price|vnd }}
-            </div>
-
-            <div class="cart_total_price">
-                {{ item.get_total|vnd }} VND
-            </div>
-
-        </div>
-
-        <!-- REMOVE -->
-        <button
-            type="button"
-            class="remove_btn remove-item-btn"
-            data-url="{% url 'remove_from_cart' item.id %}"
-            title="Xóa khỏi giỏ"
+      <!-- IMAGE -->
+      <div class="cart_img">
+        {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" />
+        {% else %}
+        <div
+          style="
+            width: 100%;
+            height: 100%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
         >
-            ✕
+          <span style="color: #999"> No Image </span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- INFO -->
+      <div class="cart_info">
+        <h5>{{ item.product.name }}</h5>
+
+        <div class="price">{{ item.product.price|vnd }} VND</div>
+      </div>
+
+      <!-- QUANTITY -->
+      <div class="cart_qty">
+        <!-- MINUS -->
+        <button
+          type="button"
+          class="qty-btn"
+          data-url="{% url 'decrease_cart' item.id %}"
+        >
+          −
         </button>
 
+        <!-- QTY -->
+        <input type="number" value="{{ item.quantity }}" readonly />
+
+        <!-- PLUS -->
+        <button
+          type="button"
+          class="qty-btn"
+          data-url="{% url 'increase_cart' item.id %}"
+        >
+          +
+        </button>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="cart_total">
+        <div class="cart_total_qty">
+          {{ item.quantity }} x {{ item.product.price|vnd }}
+        </div>
+
+        <div class="cart_total_price">{{ item.get_total|vnd }} VND</div>
+      </div>
+
+      <!-- REMOVE -->
+      <button
+        type="button"
+        class="remove_btn remove-item-btn"
+        data-url="{% url 'remove_from_cart' item.id %}"
+        title="Xóa khỏi giỏ"
+      >
+        ✕
+      </button>
     </div>
 
     {% endfor %}
 
     <!-- SUMMARY -->
     <div class="cart_summary">
+      <h4>📋 Đơn hàng của bạn</h4>
 
-        <h4>
-            📋 Đơn hàng của bạn
-        </h4>
+      <div class="summary_row">
+        <span>📦 Số lượng sản phẩm</span>
+        <span id="cart-items-count"> {{ items|length }} sản phẩm </span>
+      </div>
 
-        <div class="summary_row">
-            <span>📦 Số lượng sản phẩm</span>
-            <span id="cart-items-count">
-                {{ items|length }} sản phẩm
-            </span>
-        </div>
+      <div class="summary_row">
+        <span>🚚 Phí vận chuyển</span>
 
-        <div class="summary_row">
-            <span>🚚 Phí vận chuyển</span>
+        <span style="color: #27ae60"> Miễn phí </span>
+      </div>
 
-            <span style="color: #27ae60;">
-                Miễn phí
-            </span>
-        </div>
+      <div class="summary_row total">
+        <span>💰 Tổng cộng</span>
 
-        <div class="summary_row total">
+        <span id="cart-total-price"> {{ total|vnd }} </span>
+      </div>
 
-            <span>💰 Tổng cộng</span>
-
-            <span id="cart-total-price">
-                {{ total|vnd }} VND
-            </span>
-
-        </div>
-
-        <a href="{% url 'checkout' %}" class="checkout_btn">
-            ✓ Tiến hành thanh toán
-        </a>
-
+      <a href="{% url 'checkout' %}" class="checkout_btn">
+        ✓ Tiến hành thanh toán
+      </a>
     </div>
 
-{% else %}
+    {% else %}
 
     <div class="empty_cart">
+      <h4>🛒 Giỏ hàng trống</h4>
 
-        <h4>
-            🛒 Giỏ hàng trống
-        </h4>
+      <p>
+        Bạn chưa thêm sản phẩm nào vào giỏ hàng
+        <br />
 
-        <p>
-            Bạn chưa thêm sản phẩm nào vào giỏ hàng
-            <br>
+        <small> Hãy thêm những sản phẩm yêu thích của bạn ngay! </small>
+      </p>
 
-            <small>
-                Hãy thêm những sản phẩm yêu thích của bạn ngay!
-            </small>
-        </p>
-
-        <a href="{% url 'home' %}"
-           class="checkout_btn">
-
-            ⬅ Tiếp tục mua sắm
-
-        </a>
-
+      <a href="{% url 'home' %}" class="checkout_btn"> ⬅ Tiếp tục mua sắm </a>
     </div>
 
-{% endif %}
-
-</div>
-
+    {% endif %}
+  </div>
 </section>
 
 <script>
+  //
+  // INCREASE / DECREASE
+  //
+  document.querySelectorAll(".qty-btn").forEach((button) => {
+    button.addEventListener("click", async function () {
+      const url = this.dataset.url;
 
-//
-// INCREASE / DECREASE
-//
-document.querySelectorAll(".qty-btn")
-.forEach(button => {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        });
 
-    button.addEventListener("click", async function(){
+        const data = await response.json();
 
-        const url = this.dataset.url;
+        if (data.success) {
+          // update cart badge
+          const cartBadge = document.getElementById("cart-count");
 
-        try{
+          if (cartBadge) {
+            cartBadge.innerText = data.cart_count;
+          }
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            });
-
-            const data = await response.json();
-
-            if(data.success){
-
-                // update cart badge
-                const cartBadge =
-                    document.getElementById("cart-count");
-
-                if(cartBadge){
-                    cartBadge.innerText =
-                        data.cart_count;
-                }
-
-                // reload cart UI nhẹ hơn
-                location.reload();
-            }
-
-        }catch(err){
-
-            console.log(err);
+          // reload cart UI nhẹ hơn
+          location.reload();
         }
-
+      } catch (err) {
+        console.log(err);
+      }
     });
+  });
 
-});
+  //
+  // REMOVE ITEM
+  //
+  document.querySelectorAll(".remove-item-btn").forEach((button) => {
+    button.addEventListener("click", async function () {
+      const url = this.dataset.url;
 
-//
-// REMOVE ITEM
-//
-document.querySelectorAll(".remove-item-btn")
-.forEach(button => {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        });
 
-    button.addEventListener("click", async function(){
+        const data = await response.json();
 
-        const url = this.dataset.url;
+        if (data.success) {
+          // update badge
+          const cartBadge = document.getElementById("cart-count");
 
-        try{
+          if (cartBadge) {
+            cartBadge.innerText = data.cart_count;
+          }
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            });
-
-            const data = await response.json();
-
-            if(data.success){
-
-                // update badge
-                const cartBadge =
-                    document.getElementById("cart-count");
-
-                if(cartBadge){
-                    cartBadge.innerText =
-                        data.cart_count;
-                }
-
-                // reload
-                location.reload();
-            }
-
-        }catch(err){
-
-            console.log(err);
+          // reload
+          location.reload();
         }
-
+      } catch (err) {
+        console.log(err);
+      }
     });
-
-});
-
+  });
 </script>
 
 {% endblock %}

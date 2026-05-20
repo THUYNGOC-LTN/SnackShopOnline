@@ -238,7 +238,7 @@
 
           <div class="detail-box">
             <h5>{{ p.name }}</h5>
-            <h6>{{ p.price|vnd }} VND</h6>
+            <h6>{{ p.price|vnd }} </h6>
 
             {% if user.is_authenticated %}
             <button
@@ -285,7 +285,7 @@
 
           <div class="detail-box">
             <h5>{{ p.name }}</h5>
-            <h6>{{ p.price|vnd }} VND</h6>
+            <h6>{{ p.price|vnd }} </h6>
 
             {% if user.is_authenticated %}
             <button
@@ -345,7 +345,7 @@
 
           <div class="detail-box">
             <h5>{{ p.name }}</h5>
-            <h6>{{ p.price|vnd }} VND</h6>
+            <h6>{{ p.price|vnd }} </h6>
 
             {% if user.is_authenticated %}
             <button
@@ -516,12 +516,10 @@
 
         if (data.success) {
           //
-          // UPDATE CART COUNT
+          // UPDATE CART COUNT IN NAVBAR
           //
-          const cartBadge = document.getElementById("cart-count");
-
-          if (cartBadge) {
-            cartBadge.innerText = data.cart_count;
+          if (data.cart_count !== undefined) {
+            updateCartCount(data.cart_count);
           }
 
           //
