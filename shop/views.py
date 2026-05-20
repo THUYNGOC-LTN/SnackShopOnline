@@ -248,9 +248,7 @@ def remove_from_cart(request, item_id):
         "cart_count": cart_count
     })
 
-# =========================
-# CHECKOUT
-# =========================
+
 # =========================
 # CHECKOUT
 # =========================
@@ -272,13 +270,13 @@ def checkout(request):
     )
 
     items = CartItem.objects.filter(
-        cart=cart
+        CartItem.objects.filter(cart=cart)
     )
 
     # =========================
     # GIỎ HÀNG TRỐNG
     # =========================
-    if not items.exists():
+    if not items:
 
         if request.headers.get(
             "X-Requested-With"
