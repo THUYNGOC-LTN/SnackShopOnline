@@ -128,134 +128,19 @@
 
 <script>
 
-document.querySelectorAll(".qty-btn").forEach((button) => {
+// ==========================
+// FORMAT VND
+// ==========================
+function formatVND(number) {
 
-    button.addEventListener("click", async function () {
+    return new Intl.NumberFormat("vi-VN").format(number) + " VND";
 
-        const url = this.dataset.url;
-
-        const cartCard = this.closest(".cart_card");
-
-        try {
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-
-                // quantity = 0 => remove card
-                if (data.quantity === 0) {
-
-                    cartCard.style.transition = "0.3s";
-                    cartCard.style.opacity = "0";
-                    cartCard.style.transform = "translateX(30px)";
-
-                    setTimeout(() => {
-
-                        cartCard.remove();
-
-                        checkEmptyCart();
-
-                    }, 300);
-
-                } else {
-
-                    // update quantity
-                    cartCard.querySelector("input").value = data.quantity;
-
-                    // update subtotal
-                    cartCard.querySelector(".cart_total_price").innerText =
-                        new Intl.NumberFormat("vi-VN").format(data.item_total) + " VND";
-
-                    // update qty text
-                    const price =
-                        cartCard.querySelector(".price").innerText;
-
-                    cartCard.querySelector(".cart_total_qty").innerText =
-                        data.quantity + " x " + price;
-                }
-
-                // update total
-                updateCartTotal(data.cart_total);
-
-                // update navbar badge
-                updateNavbarCount(data.cart_count);
-            }
-
-        } catch (err) {
-
-            console.log(err);
-
-        }
-
-    });
-
-});
+}
 
 
-// REMOVE ITEM
-document.querySelectorAll(".remove-item-btn").forEach((button) => {
-
-    button.addEventListener("click", async function () {
-
-        const url = this.dataset.url;
-
-        const cartCard = this.closest(".cart_card");
-
-        if (!confirm("Bạn chắc chắn muốn xóa sản phẩm này?")) {
-            return;
-        }
-
-        try {
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-
-                cartCard.style.transition = "0.3s";
-                cartCard.style.opacity = "0";
-                cartCard.style.transform = "translateX(30px)";
-
-                setTimeout(() => {
-
-                    cartCard.remove();
-
-                    updateCartTotal(data.cart_total);
-
-                    updateNavbarCount(data.cart_count);
-
-                    checkEmptyCart();
-
-                }, 300);
-            }
-
-        } catch (err) {
-
-            console.log(err);
-
-        }
-
-    });
-
-});
-
-
+// ==========================
 // UPDATE TOTAL
+// ==========================
 function updateCartTotal(total) {
 
     const totalElement =
@@ -263,14 +148,16 @@ function updateCartTotal(total) {
 
     if (totalElement) {
 
-        totalElement.innerText =
-            new Intl.NumberFormat("vi-VN").format(total)
-            + " VND";
+        totalElement.innerText = formatVND(total);
+
     }
+
 }
 
 
+// ==========================
 // UPDATE NAVBAR COUNT
+// ==========================
 function updateNavbarCount(count) {
 
     const badge =
@@ -279,11 +166,15 @@ function updateNavbarCount(count) {
     if (badge) {
 
         badge.innerText = count;
+
     }
+
 }
 
 
-// EMPTY CART
+// ==========================
+// CHECK EMPTY CART
+// ==========================
 function checkEmptyCart() {
 
     const cards =
@@ -292,7 +183,7 @@ function checkEmptyCart() {
     if (cards.length === 0) {
 
         document.querySelector(".container").innerHTML = `
-        
+
             <div class="empty_cart">
 
                 <h4>🛒 Giỏ hàng trống</h4>
@@ -313,9 +204,194 @@ function checkEmptyCart() {
                 </a>
 
             </div>
+
         `;
+
     }
+
 }
+
+
+// ==========================
+// REMOVE ITEM
+// ==========================
+document.querySelectorAll(".remove-item-btn").forEach((button) => {
+
+    button.addEventListener("click", async function () {
+
+        const url =
+            this.dataset.url;
+
+        const cartCard =
+            this.closest(".cart_card");
+
+        if (!confirm("Bạn chắc chắn muốn xóa sản phẩm này?")) {
+
+            return;
+
+        }
+
+        try {
+
+            const response = await fetch(url, {
+
+                method: "POST",
+
+                headers: {
+
+                    "X-Requested-With": "XMLHttpRequest",
+
+                    "X-CSRFToken": "{{ csrf_token }}",
+
+                },
+
+            });
+
+            const data =
+                await response.json();
+
+            if (data.success) {
+
+                // animation
+                cartCard.style.transition =
+                    "all 0.3s ease";
+
+                cartCard.style.opacity =
+                    "0";
+
+                cartCard.style.transform =
+                    "translateX(40px)";
+
+                setTimeout(() => {
+
+                    cartCard.remove();
+
+                    // update total
+                    updateCartTotal(data.cart_total);
+
+                    // update navbar
+                    updateNavbarCount(data.cart_count);
+
+                    // update item count
+                    const countElement =
+                        document.getElementById("cart-items-count");
+
+                    if (countElement) {
+
+                        countElement.innerText =
+                            document.querySelectorAll(".cart_card").length +
+                            " sản phẩm";
+
+                    }
+
+                    // check empty
+                    checkEmptyCart();
+
+                }, 300);
+
+            }
+
+        } catch (err) {
+
+            console.log(err);
+
+        }
+
+    });
+
+});
+
+
+// ==========================
+// QUANTITY BUTTON
+// ==========================
+document.querySelectorAll(".qty-btn").forEach((button) => {
+
+    button.addEventListener("click", async function () {
+
+        const url =
+            this.dataset.url;
+
+        const cartCard =
+            this.closest(".cart_card");
+
+        try {
+
+            const response = await fetch(url, {
+
+                method: "POST",
+
+                headers: {
+
+                    "X-Requested-With": "XMLHttpRequest",
+
+                    "X-CSRFToken": "{{ csrf_token }}",
+
+                },
+
+            });
+
+            const data =
+                await response.json();
+
+            if (data.success) {
+
+                // quantity = 0
+                if (data.quantity === 0) {
+
+                    cartCard.style.transition =
+                        "all 0.3s ease";
+
+                    cartCard.style.opacity =
+                        "0";
+
+                    cartCard.style.transform =
+                        "translateX(40px)";
+
+                    setTimeout(() => {
+
+                        cartCard.remove();
+
+                        checkEmptyCart();
+
+                    }, 300);
+
+                } else {
+
+                    // update quantity input
+                    cartCard.querySelector("input").value =
+                        data.quantity;
+
+                    // update subtotal
+                    cartCard.querySelector(".cart_total_price").innerText =
+                        formatVND(data.item_total);
+
+                    // update qty text
+                    const productPrice =
+                        cartCard.querySelector(".price").innerText;
+
+                    cartCard.querySelector(".cart_total_qty").innerText =
+                        data.quantity + " x " + productPrice;
+
+                }
+
+                // update total
+                updateCartTotal(data.cart_total);
+
+                // update navbar
+                updateNavbarCount(data.cart_count);
+
+            }
+
+        } catch (err) {
+
+            console.log(err);
+
+        }
+
+    });
+
+});
 
 </script>
 

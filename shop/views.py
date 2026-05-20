@@ -214,10 +214,6 @@ def update_quantity(request, item_id):
 
     return redirect('cart')
 
-
-# =========================
-# REMOVE ITEM
-# =========================
 # =========================
 # REMOVE ITEM
 # =========================
