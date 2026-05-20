@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% load static %} {% load custom_filters %} 
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block
+content %}
 
 <section class="cart_section">
   <div class="container">
@@ -166,13 +166,15 @@
 
   document.querySelectorAll(".remove-item-btn").forEach((button) => {
     button.addEventListener("click", async function (e) {
-      // Let custom.js handlers take precedence if available
-      // This is a fallback only
       const url = this.dataset.url;
 
       if (!confirm("Bạn chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
         return;
       }
+
+      // Disable button with visual feedback
+      this.disabled = true;
+      this.style.opacity = "0.6";
 
       try {
         const response = await fetch(url, {
@@ -186,20 +188,78 @@
         const data = await response.json();
 
         if (data.success) {
-          // Update cart count in navbar
-          if (
-            typeof updateCartCount === "function" &&
-            data.cart_count !== undefined
-          ) {
-            updateCartCount(data.cart_count);
-          }
+          // Smooth animation to remove the cart card
+          const cartCard = this.closest(".cart_card");
+          if (cartCard) {
+            cartCard.style.transition =
+              "opacity 0.3s ease, transform 0.3s ease";
+            cartCard.style.opacity = "0";
+            cartCard.style.transform = "translateX(20px)";
 
-          // Let custom.js handle the smooth UI update
-          // Reload after a brief delay to ensure proper state
-          setTimeout(() => location.reload(), 500);
+            setTimeout(() => {
+              cartCard.remove();
+
+              // Update cart total price
+              const cartTotalPrice =
+                document.getElementById("cart-total-price");
+              if (cartTotalPrice && data.cart_total !== undefined) {
+                cartTotalPrice.innerText =
+                  new Intl.NumberFormat("vi-VN").format(data.cart_total) +
+                  " VND";
+              }
+
+              // Update cart items count
+              const cartItemsCount =
+                document.getElementById("cart-items-count");
+              if (cartItemsCount) {
+                const itemCount =
+                  document.querySelectorAll(".cart_card").length;
+                cartItemsCount.innerText = itemCount + " sản phẩm";
+              }
+
+              // Update cart count in navbar
+              if (
+                typeof updateCartCount === "function" &&
+                data.cart_count !== undefined
+              ) {
+                updateCartCount(data.cart_count);
+              }
+
+              // Check if cart is empty
+              const remainingCards = document.querySelectorAll(".cart_card");
+              if (remainingCards.length === 0) {
+                // Show empty cart message
+                const cartSection = document.querySelector(".cart_section");
+                if (cartSection) {
+                  cartSection.innerHTML = `
+                    <div class="container">
+                      <div class="empty_cart" style="text-align: center; padding: 60px 20px;">
+                        <h4>🛒 Giỏ hàng của bạn trống</h4>
+                        <p style="color: #666; font-size: 16px; margin: 15px 0;">
+                          Bạn chưa thêm sản phẩm nào vào giỏ hàng
+                          <br />
+                          <small> Hãy thêm những sản phẩm yêu thích của bạn ngay! </small>
+                        </p>
+                        <a href="{% url 'home' %}" class="checkout_btn"> ⬅ Tiếp tục mua sắm </a>
+                      </div>
+                    </div>
+                  `;
+                }
+              }
+            }, 300);
+          }
+        } else {
+          alert(
+            "❌ Có lỗi xảy ra: " + (data.message || "Không thể xóa sản phẩm"),
+          );
+          this.disabled = false;
+          this.style.opacity = "1";
         }
       } catch (err) {
-        console.log(err);
+        console.error("Error:", err);
+        alert("❌ Có lỗi xảy ra");
+        this.disabled = false;
+        this.style.opacity = "1";
       }
     });
   });
