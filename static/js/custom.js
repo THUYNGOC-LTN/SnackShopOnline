@@ -30,21 +30,21 @@ function updateCartCount(count) {
   const cartLink = document.querySelector(".cart_link");
   if (!cartLink) return;
 
-  // Find or create the badge
+  // Find the badge element
   let badge = cartLink.querySelector(".badge");
-  if (!badge && count > 0) {
+  if (!badge) {
+    // Create badge if it doesn't exist
     badge = document.createElement("span");
     badge.className = "badge";
     cartLink.appendChild(badge);
   }
 
-  if (badge) {
-    if (count > 0) {
-      badge.textContent = count;
-      badge.style.display = "inline";
-    } else {
-      badge.style.display = "none";
-    }
+  // Update badge content and visibility
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
   }
 }
 
@@ -174,6 +174,11 @@ document.addEventListener("DOMContentLoaded", function () {
               ".000 VND";
           }
 
+          // Update cart count in navbar
+          if (data.cart_count !== undefined) {
+            updateCartCount(data.cart_count);
+          }
+
           this.disabled = false;
           this.style.opacity = "1";
         } else {
@@ -250,6 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const itemCount =
                   document.querySelectorAll(".cart_card").length;
                 cartItemsCount.innerText = itemCount + " sản phẩm";
+              }
+
+              // Update cart count in navbar
+              if (data.cart_count !== undefined) {
+                updateCartCount(data.cart_count);
               }
 
               // Check if cart is empty

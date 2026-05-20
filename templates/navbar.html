@@ -108,9 +108,13 @@
           {% if user.is_authenticated and not user.is_staff %}
 
           <a class="cart_link" href="{% url 'cart' %}" title="Xem giỏ hàng">
-            🛒 {% if cart_count > 0 %}
-            <span class="badge">{{ cart_count }}</span>
-            {% endif %}
+            🛒
+            <span
+              class="badge"
+              style="{% if cart_count <= 0 %}display:none;{% endif %}"
+            >
+              {{ cart_count }}
+            </span>
           </a>
 
           {% endif %}

@@ -8,7 +8,10 @@ def cart_count(request):
     if request.user.is_authenticated and not request.user.is_staff:
         cart = Cart.objects.filter(user=request.user).first()
         if cart:
-            cart_count_value = CartItem.objects.filter(cart=cart).count()
+            # Sum all quantities instead of counting items
+            cart_count_value = sum(
+                item.quantity for item in CartItem.objects.filter(cart=cart)
+            )
     
     return {
         'cart_count': cart_count_value
