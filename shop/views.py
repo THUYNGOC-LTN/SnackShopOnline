@@ -270,13 +270,13 @@ def checkout(request):
     )
 
     items = CartItem.objects.filter(
-        CartItem.objects.filter(cart=cart)
+        cart=cart
     )
 
     # =========================
     # GIỎ HÀNG TRỐNG
     # =========================
-    if not items:
+    if not items.exists():
 
         if request.headers.get(
             "X-Requested-With"
