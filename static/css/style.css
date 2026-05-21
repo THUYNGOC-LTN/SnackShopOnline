@@ -395,11 +395,6 @@ a:focus {
   overflow-y: auto !important;
 }
 
-.navbar-collapse:not(.show) {
-  max-height: 0 !important;
-  overflow: hidden !important;
-}
-
 /*end header section*/
 /* slider section */
 .slider_section {
