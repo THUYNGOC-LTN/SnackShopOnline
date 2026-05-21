@@ -390,7 +390,14 @@ a:focus {
 /* Ensure navbar collapse shows properly on mobile */
 .navbar-collapse.show {
   display: flex !important;
-  flex-direction: column;
+  flex-direction: column !important;
+  max-height: 500px !important;
+  overflow-y: auto !important;
+}
+
+.navbar-collapse:not(.show) {
+  max-height: 0 !important;
+  overflow: hidden !important;
 }
 
 /*end header section*/

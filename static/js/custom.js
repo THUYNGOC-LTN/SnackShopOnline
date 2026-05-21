@@ -7,6 +7,29 @@ function getYear() {
 
 getYear();
 
+// Fix navbar collapse toggle for mobile
+document.addEventListener("DOMContentLoaded", function () {
+  const navbarToggler = document.querySelector(".navbar-toggler");
+  const navbarCollapse = document.querySelector(".navbar-collapse");
+
+  if (navbarToggler && navbarCollapse) {
+    navbarToggler.addEventListener("click", function () {
+      navbarCollapse.classList.toggle("show");
+      const isExpanded = this.getAttribute("aria-expanded") === "true";
+      this.setAttribute("aria-expanded", !isExpanded);
+    });
+
+    // Close menu when clicking on a link
+    const navLinks = navbarCollapse.querySelectorAll(".nav-link, a");
+    navLinks.forEach((link) => {
+      link.addEventListener("click", function () {
+        navbarCollapse.classList.remove("show");
+        navbarToggler.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+});
+
 // Get CSRF token from cookie
 function getCookie(name) {
   let cookieValue = null;
