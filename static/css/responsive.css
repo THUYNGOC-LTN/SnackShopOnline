@@ -21,14 +21,23 @@
     padding: 15px 20px;
     border: 1px solid rgba(255, 190, 51, 0.2);
     display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    z-index: 10001;
   }
 
   .navbar-collapse.show {
     display: flex !important;
     flex-direction: column;
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    right: 10px;
+    width: calc(100% - 20px);
     z-index: 10001;
-    width: 100%;
   }
 
   .custom_nav-container {
@@ -182,14 +191,23 @@
     margin-top: 8px;
     padding: 12px 15px;
     display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    z-index: 10001;
   }
 
   .navbar-collapse.show {
     display: flex !important;
     flex-direction: column;
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    right: 10px;
+    width: calc(100% - 20px);
     z-index: 10001;
-    width: 100%;
   }
 
   .custom_nav-container .navbar-nav .nav-item .nav-link {
@@ -257,14 +275,23 @@
       rgba(0, 0, 0, 0.85)
     );
     display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    z-index: 10001;
   }
 
   .navbar-collapse.show {
     display: flex !important;
     flex-direction: column;
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    width: calc(100% - 16px);
     z-index: 10001;
-    width: 100%;
   }
 
   .custom_nav-container .navbar-nav {
@@ -354,14 +381,23 @@
       rgba(0, 0, 0, 0.85)
     );
     display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    z-index: 10001;
   }
 
   .navbar-collapse.show {
     display: flex !important;
     flex-direction: column;
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    width: calc(100% - 16px);
     z-index: 10001;
-    width: 100%;
   }
 
   .custom_nav-container .navbar-nav .nav-item .nav-link {

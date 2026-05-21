@@ -194,6 +194,7 @@ a:focus {
   z-index: 9999;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
+  overflow: visible;
 }
 
 .header_section * {
@@ -204,10 +205,13 @@ a:focus {
 .header_section .container-fluid {
   padding-right: 25px;
   padding-left: 25px;
+  overflow: visible;
 }
 
 .navbar {
   background: transparent !important;
+  position: relative;
+  overflow: visible;
 }
 
 .navbar-brand {
