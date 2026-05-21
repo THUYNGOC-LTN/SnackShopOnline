@@ -383,6 +383,12 @@ a:focus {
   top: 0;
 }
 
+/* Ensure navbar collapse shows properly on mobile */
+.navbar-collapse.show {
+  display: flex !important;
+  flex-direction: column;
+}
+
 /*end header section*/
 /* slider section */
 .slider_section {
