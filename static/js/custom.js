@@ -2,25 +2,38 @@
 function getYear() {
   var currentDate = new Date();
   var currentYear = currentDate.getFullYear();
-  document.querySelector("#displayYear").innerHTML = currentYear;
+  const yearElement = document.querySelector("#displayYear");
+  if (yearElement) {
+    yearElement.innerHTML = currentYear;
+  }
 }
 
 getYear();
 
-// Fix navbar collapse toggle for mobile
+// Fix navbar collapse toggle for mobile - FORCE JAVASCRIPT HANDLING
 document.addEventListener("DOMContentLoaded", function () {
   const navbarToggler = document.querySelector(".navbar-toggler");
   const navbarCollapse = document.querySelector(".navbar-collapse");
 
   if (navbarToggler && navbarCollapse) {
-    navbarToggler.addEventListener("click", function () {
+    // Remove Bootstrap data attributes and handle manually
+    navbarToggler.removeAttribute("data-bs-toggle");
+    navbarToggler.removeAttribute("data-bs-target");
+
+    // Add click handler
+    navbarToggler.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      console.log("Navbar toggler clicked!");
       navbarCollapse.classList.toggle("show");
-      const isExpanded = this.getAttribute("aria-expanded") === "true";
-      this.setAttribute("aria-expanded", !isExpanded);
+
+      const isExpanded = navbarCollapse.classList.contains("show");
+      navbarToggler.setAttribute("aria-expanded", isExpanded);
     });
 
     // Close menu when clicking on a link
-    const navLinks = navbarCollapse.querySelectorAll(".nav-link, a");
+    const navLinks = navbarCollapse.querySelectorAll("a");
     navLinks.forEach((link) => {
       link.addEventListener("click", function () {
         navbarCollapse.classList.remove("show");
