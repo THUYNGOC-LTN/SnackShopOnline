@@ -362,16 +362,16 @@ document.querySelectorAll(".qty-btn").forEach((button) => {
                     cartCard.querySelector("input").value =
                         data.quantity;
 
-                    // update subtotal
+                    // update subtotal  - FIX: item_total từ server là tổng tiền (giá x số lượng)
                     cartCard.querySelector(".cart_total_price").innerText =
                         formatVND(data.item_total);
 
-                    // update qty text
-                    const productPrice =
-                        cartCard.querySelector(".price").innerText;
+                    // update qty text - FIX: tính đúng giá gốc
+                    const productPrice = data.item_total / data.quantity;
+                    const priceFormatted = new Intl.NumberFormat("vi-VN").format(productPrice);
 
                     cartCard.querySelector(".cart_total_qty").innerText =
-                        data.quantity + " x " + productPrice;
+                        data.quantity + " x " + priceFormatted;
 
                 }
 
