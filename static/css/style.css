@@ -5639,6 +5639,24 @@ body {
   font-size: 18px;
 }
 
+/* LOCKED ACCOUNT ERROR */
+.auth_error_locked {
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  animation: shake 0.5s ease-in-out;
+  border: 2px solid #ff1744;
+  padding: 18px 20px;
+}
+
+.auth_error_locked::before {
+  content: "🔒";
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
 /* BUTTON */
 .auth_btn {
   width: 100%;

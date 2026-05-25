@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Q, Max
 from datetime import timedelta
 from django.utils import timezone
+from axes.exceptions import AxesFailure
+from axes.models import AccessAttempt
 from .models import Payment, ShopReview
 from django.http import JsonResponse
 
@@ -104,24 +106,46 @@ def register(request):
 # =========================
 def user_login(request):
     if request.method == "POST":
-
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(request=request, username=username, password=password)
+        try:
+            user = authenticate(request=request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
+            if user is not None:
+                login(request, user)
 
-            # 🔥 phân quyền rõ ràng
-            if user.is_superuser or user.is_staff:
-                return redirect("admin_dashboard")
+                # 🔥 phân quyền rõ ràng
+                if user.is_superuser or user.is_staff:
+                    return redirect("admin_dashboard")
 
-            return redirect("home")
+                return redirect("home")
+            else:
+                # Kiểm tra có bị khóa không
+                attempt = AccessAttempt.objects.filter(username=username, failures__gte=5).first()
+                if attempt and attempt.locked_until and timezone.now() < attempt.locked_until:
+                    lockout_time = (attempt.locked_until - timezone.now()).seconds // 60
+                    return render(request, "auth/login.html", {
+                        "error": f"❌ Tài khoản bị khóa do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau {lockout_time} phút."
+                    })
+                
+                return render(request, "auth/login.html", {
+                    "error": "❌ Sai tài khoản hoặc mật khẩu"
+                })
 
-        return render(request, "auth/login.html", {
-            "error": "Sai tài khoản hoặc mật khẩu"
-        })
+        except AxesFailure:
+            # Xử lý khi bị khóa bởi django-axes
+            attempt = AccessAttempt.objects.filter(username=username).first()
+            if attempt and attempt.locked_until:
+                lockout_time = (attempt.locked_until - timezone.now()).seconds // 60
+                return render(request, "auth/login.html", {
+                    "error": f"⏳ Tài khoản bị khóa do quá nhiều lần đăng nhập sai. Vui lòng thử lại sau {lockout_time} phút.",
+                    "locked": True
+                })
+            else:
+                return render(request, "auth/login.html", {
+                    "error": "❌ Tài khoản bị khóa tạm thời. Vui lòng thử lại sau một lúc."
+                })
 
     return render(request, "auth/login.html")
 

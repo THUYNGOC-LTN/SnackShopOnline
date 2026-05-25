@@ -46,7 +46,9 @@
 
         <!-- ERROR -->
         {% if error %}
-        <div class="auth_error">{{ error }}</div>
+        <div class="auth_error {% if locked %}auth_error_locked{% endif %}">
+          {{ error }}
+        </div>
         {% endif %}
 
         <!-- BUTTON -->

@@ -183,18 +183,21 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # ========================
-# DJANGO AXES
+# DJANGO AXES - Brute Force Protection
 # ========================
+from datetime import timedelta
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AXES_ENABLED = False
-AXES_FAILURE_LIMIT = 10
-AXES_COOLOFF_TIME = 1
-AXES_LOCKOUT_CALLABLE = None
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 5  # Khóa sau 5 lần sai
+AXES_COOLOFF_TIME = timedelta(hours=1)  # Khóa 1 giờ
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_USE_USER_AGENT = False
+AXES_VERBOSE = True
 # ========================
 # DEFAULT PRIMARY KEY
 # ========================
