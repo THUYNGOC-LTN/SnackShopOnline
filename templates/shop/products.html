@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% load static %} {% load custom_filters %} 
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block
+content %}
 
 <section class="products_page">
   <div class="container py-5">
@@ -80,7 +80,7 @@
               <div class="product_info">
                 <h5>{{ p.name }}</h5>
 
-                <span> {{ p.price|vnd }} ₫ </span>
+                <span> {{ p.price|vnd }} </span>
 
                 <div class="product_actions">
                   <a href="{% url 'product_detail' p.id %}" class="detail_btn">
